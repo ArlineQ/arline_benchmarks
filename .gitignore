@@ -1,0 +1,14 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Vim temporary files
+*.swp
+*.swo
+
+# MacBook Files
+*.DS_Store
+
+# Jupyter backups
+.ipynb_checkpoints
