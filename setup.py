@@ -21,7 +21,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="arline-benchmarks",
-    version="0.1.4",
+    version="0.1.5",
     author="Turation Ltd",
     author_email="info@arline.io",
     description="Automated benchmarking platform for quantum compilers",
@@ -43,7 +43,7 @@ setuptools.setup(
         "matplotlib>=3.2.1",
         "cirq~=0.6.0",
         "qiskit~=0.18.0",
-        "arline-quantum~=0.1.4",
+        "arline-quantum~=0.1.5",
     ],
     classifiers=[
         "Programming Language :: Python :: 3",

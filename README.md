@@ -73,9 +73,9 @@ https://miktex.org. TeXworks frontend is not required and can be ignored.
 
 
 
-## Getting Started
+## Getting started
 
-### Benchmark Example Run
+### Benchmark example run
 
 In order to run your first benchmarking experiment execute following commands
 ```console
@@ -145,6 +145,7 @@ Each `pipeline_i = {...}` is represented as a dictionary that contains a descrip
 
 ## API documentation
 
+API documentation is here [documentation](https://arline-benchmarks.readthedocs.io/en/latest/).
 To generate HTML API documentation, run below command:
 
 ```console
@@ -165,22 +166,23 @@ $ tox
 ```
 arline_benchmarks
 │
-├── configs                      # configuration files
-│   └── compression              # config .jsonnet file and .sh scripts  
-│
-├── circuits                     # qasm circuits dataset
-│
-├── scripts                      # run files
-│
 ├── arline_benchmarks            # platform classes
 │   ├── config_parser            # parser of pipeline configuration
 │   ├── engine                   # pipeline engine
 │   ├── metrics                  # metrics for pipeline comparison
+|   ├── pipeline                 # pipeline
 │   ├── reports                  # LaTeX report generator
 │   ├── strategies               # list of strategies for mapping/compression/rebase
 │   └── targets                  # target generator
 │
+├── circuits                     # qasm circuits dataset
+│
+├── configs                      # configuration files
+│   └── compression              # config .jsonnet file and .sh scripts
+│
 ├── docs                         # documentation
+│
+├── scripts                      # run files
 │
 └── test                         # tests
     ├── qasm_files               # .qasm files for test

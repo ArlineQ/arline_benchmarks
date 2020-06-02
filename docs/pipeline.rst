@@ -1,7 +1,7 @@
 .. _pipeline:
 
-Metrics
-=======
+Pipelines
+=========
 
 .. automodule:: arline_benchmarks.pipeline.pipeline
    :members:
