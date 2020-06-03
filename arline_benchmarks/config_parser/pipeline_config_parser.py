@@ -22,7 +22,8 @@ import _jsonnet
 class PipelineConfigParser(dict):
     """Loads experiment configuration from disk (.jsonnet config file)
 
-        :param str config_path: path to config
+        :param setup_config_path: path to config
+        :type setup_config_path: str
     """
 
     def __init__(self, setup_config_path):
