@@ -6,15 +6,15 @@ each other on a list of predefined hardware types and target circuit classes.
 ## Demo (report generation preview)
 
 ### Benchmarking run
-![Benchmarking run](https://media.giphy.com/media/W3eXiS5JQ73zSKRy2q/source.gif)
+![Benchmarking run](https://media.giphy.com/media/UTYhq49IghgFZAupQD/source.gif)
 
 ### LaTeX report
-![Report](https://media.giphy.com/media/S9twlidRrhyRJMSu4G/source.gif)
+![Report](https://media.giphy.com/media/ejJgh5eHfHXqi57DB4/source.gif)
 
 ## List of supported compilation frameworks
 
-* Cirq (Google)
-* Qiskit (IBM)
+* [Google Cirq library](https://github.com/quantumlib/Cirq)
+* [IBM Qiskit](https://github.com/Qiskit)
 
 ## Installation
 

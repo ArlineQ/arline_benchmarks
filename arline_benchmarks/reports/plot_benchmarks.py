@@ -87,7 +87,7 @@ class BenchmarkPlotter:
                     print(f"Error occurred when plotting {title}:", file=sys.stderr)
                     traceback.print_exc(file=sys.stderr)
                     print("Plot config:", file=sys.stderr)
-                    print(plot_cfg, stream=sys.stderr)
+                    pprint(plot_cfg, stream=sys.stderr)
                 # save
                 filename = plot_cfg["filename"].format(**comb_conditions, **plot_cfg["additional_args"])
                 filename = path.join(
