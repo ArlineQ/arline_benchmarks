@@ -6,7 +6,7 @@ each other on a list of predefined hardware types and target circuit classes.
 ## Demo (report generation preview)
 
 ### Benchmarking run
-![Benchmarking run](https://media.giphy.com/media/YrTG8V9BHQtKbUSgCy/source.gif)
+![Benchmarking run](https://media.giphy.com/media/UTYhq49IghgFZAupQD/source.gif)
 
 ### LaTeX report
 ![Report](https://media.giphy.com/media/ejJgh5eHfHXqi57DB4/source.gif)
