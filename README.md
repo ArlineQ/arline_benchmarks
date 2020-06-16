@@ -3,6 +3,19 @@
 **Arline Benchmarks** platform allows to benchmark various algorithms for quantum circuit mapping/compression against
 each other on a list of predefined hardware types and target circuit classes.
 
+## Demo (report generation preview)
+
+### Benchmarking run
+![Benchmarking run](https://media.giphy.com/media/W3eXiS5JQ73zSKRy2q/source.gif)
+
+### LaTeX report
+![Report](https://media.giphy.com/media/S9twlidRrhyRJMSu4G/source.gif)
+
+## List of supported compilation frameworks
+
+* Cirq (Google)
+* Qiskit (IBM)
+
 ## Installation
 
 ```console
@@ -68,7 +81,7 @@ On MacOS simply install MacTex distribution from the [official website](https://
 
 #### Alternative solution for Linux/Windows/MacOS:
 
-TeXLive can be also installed as a part of the MikTex package by downloading and installing source code from 
+TeXLive can be also installed as a part of the MikTex package by downloading and installing source code from
 https://miktex.org. TeXworks frontend is not required and can be ignored.
 
 

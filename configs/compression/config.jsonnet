@@ -93,7 +93,7 @@ local pipelines_set(target, hardware, plot_group) = [
 // Define random circuit targets from [Clifford, T] gate set
 local random_chain_cliford_t_target(num_qubits, chain_length) = {
   task: 'circuit_transformation',
-  name: 'random_chain_CliffordTAll2All_' + num_qubits + 'q_' + chain_length,  // random chain identificator
+  name: 'random_chain_clifford_t_' + num_qubits + 'q_' + chain_length,  // random chain identificator
   hardware: {
     name: 'CliffordTAll2All',  // name of hardware class [determines gateset of generated target circuit]
     args: {
@@ -118,7 +118,7 @@ local random_chain_cx_u3_target(num_qubits, chain_length) = {
   name: 'random_chain_cx_u3_' + num_qubits + 'q_' + chain_length,  // random chain identificator
   hardware: {
     gate_set: ['U3', 'Cnot'],
-    num_qubits: 16,
+    num_qubits: num_qubits,
   },
   algo: 'random_chain',
   number: 10,  // number of circuits to be generated
@@ -178,6 +178,7 @@ local hardware_16q = [
 // Nested .jsonnet lists expressed via "for loops" allow to
 // generate all possible combinations of targets, hardware and compilation pipelines
 // subject to benchmarking.
+local fig_format = 'pdf';
 {
   pipelines:
     std.flattenArrays([  // 2 qubit benchmarks
@@ -227,7 +228,7 @@ local hardware_16q = [
         stages_settings: stages_settings,
       },
       filename: '{Plot Group}/{Test Target Generator Name}/{Pipeline Output Hardware Name}/' +
-                'bars_{y_col}.png',
+                'bars_{y_col}.' + fig_format,
     },
     local bars_multiqubit(y_col, yscale) = {
       title: y_col,
@@ -241,7 +242,7 @@ local hardware_16q = [
         yscale: yscale,
       },
       filename: '{Plot Group}/{Test Target Generator Name}/{Pipeline Output Hardware Name}/' +
-                'bars_{y_col}.png',
+                'bars_{y_col}.' + fig_format,
     },
     local scatter_multiqubit(x_col, y_col, input_stage, output_stage,) = {
       title: '{y_col} vs {x_col}',
@@ -256,7 +257,7 @@ local hardware_16q = [
         pipelines_settings: pipelines_settings,
       },
       filename: '{Plot Group}/{Test Target Generator Name}/{Pipeline Output Hardware Name}/' +
-                'scatter_{y_col}_vs_{x_col}.png',
+                'scatter_{y_col}_vs_{x_col}.' + fig_format,
     },
     local compression_multiqubit(input_stage, output_stage) = {
       title: 'Compression Factor',
@@ -276,7 +277,7 @@ local hardware_16q = [
         pipelines_settings: pipelines_settings,
       },
       filename: '{Plot Group}/{Test Target Generator Name}/{Pipeline Output Hardware Name}/' +
-                'compression_{input_stage}_to_{output_stage}.png',
+                'compression_{input_stage}_to_{output_stage}.' + fig_format,
     },
     local hardware_heatmap_multiqubit(compression_feature, rows_feature, input_stage, output_stage, row_label=null) = {
       title: 'CF({compression_feature})',
@@ -292,7 +293,7 @@ local hardware_16q = [
         row_label: row_label,
       },
       filename: '{Plot Group}/{Test Target Generator Name}/' +
-                'comp_heatmap_{compression_feature}_{input_stage}_to_{output_stage}.png',
+                'comp_heatmap_{compression_feature}_{input_stage}_to_{output_stage}.' + fig_format,
     },
     local target_heatmap_multiqubit(compression_feature, input_stage, output_stage) = {
       title: 'CF({compression_feature})',
@@ -308,7 +309,7 @@ local hardware_16q = [
         row_label: 'Target',
       },
       filename: '{Plot Group}/{Test Target Generator Name}/{Pipeline Output Hardware Name}/' +
-                'comp_heatmap_{compression_feature}_{input_stage}_to_{output_stage}.png',
+                'comp_heatmap_{compression_feature}_{input_stage}_to_{output_stage}.' + fig_format,
     },
     plots: [
       // Grid plot with radar subplots
@@ -329,7 +330,7 @@ local hardware_16q = [
           pipelines_settings: pipelines_settings,
         },
         filename: '{Plot Group}/' +
-                  'comp_radar_{input_stage}_to_{output_stage}_grid.png',
+                  'comp_radar_{input_stage}_to_{output_stage}_grid.' + fig_format,
       },
       bars_2q(y_col='Depth', baseline_value=7),
       bars_2q(y_col='Single-Qubit Gate Count', baseline_value=8),
@@ -359,7 +360,7 @@ local hardware_16q = [
           pipelines_settings: pipelines_settings,
         },
         filename: '{Plot Group}/{Test Target Generator Name}/{Pipeline Output Hardware Name}/' +
-                  'comp_radar_{input_stage}_to_{output_stage}.png',
+                  'comp_radar_{input_stage}_to_{output_stage}.' + fig_format,
       },
       hardware_heatmap_multiqubit(compression_feature='Depth',
                                   rows_feature='Pipeline Output Hardware Name',
@@ -396,7 +397,7 @@ local hardware_16q = [
           yscale: 'log',
         },
         filename: '{Plot Group}/{Test Target Generator Name}/{Pipeline Output Hardware Name}/' +
-                  'bars_Execution Time.png',
+                  'bars_Execution Time.' + fig_format,
       },
       scatter_multiqubit(x_col='Input Depth',
                          y_col='Execution Time',
@@ -447,7 +448,7 @@ local hardware_16q = [
           stages_settings: stages_settings,
         },
         filename: '{Plot Group}/{Test Target Generator Name}/{Pipeline Output Hardware Name}/' +
-                  'gate_composition_heatmap_{Pipeline ID}.png',
+                  'gate_composition_heatmap_{Pipeline ID}.' + fig_format,
       },
 
     ],

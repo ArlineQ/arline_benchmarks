@@ -322,6 +322,8 @@ if __name__ == "__main__":
     doc = Document(documentclass="report", geometry_options=geometry_options, default_filepath=filepath)
     doc.preamble.append(NoEscape(r"\linespread{1.5}"))
 
+    fig_format = "pdf"
+
     doc.preamble.append(
         Command(
             "title",
@@ -337,7 +339,7 @@ if __name__ == "__main__":
             ),
         )
     )
-    doc.preamble.append(Command("author", "https://github.com/ArlineQ/ArlineBenchmarks"))
+    doc.preamble.append(Command("author", "https://github.com/ArlineQ/arline_benchmarks"))
     doc.preamble.append(Command("date", NoEscape(r"\today")))
     doc.append(NoEscape(r"\maketitle"))
     doc.append(NoEscape(r"\tableofcontents"))
@@ -352,7 +354,7 @@ if __name__ == "__main__":
         header.append(
             NoEscape(
                 r"""\footnotesize{\textbf{Automatically generated report by Arline Benchmarks \\
-                https://github.com/ArlineQ/ArlineBenchmarks}}"""
+                https://github.com/ArlineQ/arline\_benchmarks}}"""
             )
         )
     doc.preamble.append(header)
@@ -437,7 +439,8 @@ if __name__ == "__main__":
                     )
                     doc.append(
                         NoEscape(
-                            f"""v{version('qiskit')} (open-source).""" + r"""
+                            f"""v{version('qiskit')} (open-source)."""
+                            + r"""
                             \textbf{Qiskit} is an open-source framework for working with quantum computers at the 
                             level of circuits, pulses, and algorithms. Qiskit transpiler combines mapping and 
                             compression subroutines. The transpiler has three levels of optimization, in our report, 
@@ -466,8 +469,8 @@ if __name__ == "__main__":
                     itemize.add_item(NoEscape(r"""\textbf{Google Cirq library} """))
                     doc.append(
                         NoEscape(
-                            f"""v{version('cirq')} (open-source). """ +
-                            r"""\textbf{Cirq} has been developed by Google AI Quantum Team.
+                            f"""v{version('cirq')} (open-source). """
+                            + r"""\textbf{Cirq} has been developed by Google AI Quantum Team.
                             Cirq supports mapping/routing operations and tailored
                             towards specific grid-like qubit coupling topologies."""
                         )
@@ -542,10 +545,10 @@ if __name__ == "__main__":
         with doc.create(Section("Hardware Backends ")):
             doc.append(NoEscape(r"""Hardware backends are defined in open-source \textbf{Arline Quantum} library """))
             doc.append(LineBreak())
-            doc.append(Hyperref(marker="", text="""https://github.com/ArlineQ/ArlineQuantum"""))
+            doc.append(Hyperref(marker="", text="""https://github.com/ArlineQ/arline_quantum"""))
             doc.append(
                 NoEscape(
-                    r""". Names of hardware backends reflect gate set and connectivity. E.g. IbmALl2All16Q
+                    r""". Names of hardware backends reflect gate set and connectivity. E.g. IbmAll2All16Q
                     corresponds to a 16-qubit fully-connected mock backend with the native gate set of the IBM
                     quantum hardware. \bigskip
                     """
@@ -580,9 +583,7 @@ if __name__ == "__main__":
             )
         )
         doc.append(
-            NoEscape(
-                f"""Number of pipelines for benchmarking: """ + r"\textbf{" + "{:}".format(len(pipelines)) + r"}"
-            )
+            NoEscape(f"""Number of pipelines for benchmarking: """ + r"\textbf{" + "{:}".format(len(pipelines)) + r"}")
         )
         with doc.create(Itemize()) as itemize:
             for pip_i in range(len(pipelines)):
@@ -670,12 +671,16 @@ if __name__ == "__main__":
                         )
                     )
                     with doc.create(Figure(position="h")) as fig:
-                        kak_scheme_path = path.join(os.path.dirname(os.path.abspath(arline_benchmarks.__file__)), "reports")
+                        kak_scheme_path = path.join(
+                            os.path.dirname(os.path.abspath(arline_benchmarks.__file__)), "reports"
+                        )
                         filename = "./kak_scheme.png"
                         filename = os.path.join(kak_scheme_path, filename)
 
                         fig.add_image(filename, width=NoEscape(r"0.7\textwidth"))
-                        fig.add_caption(NoEscape(r"""\label{fig:KAK}KAK decomposition scheme for two-qubit circuits."""))
+                        fig.add_caption(
+                            NoEscape(r"""\label{fig:KAK}KAK decomposition scheme for two-qubit circuits.""")
+                        )
                     doc.append(
                         NoEscape(
                             r"""\noindent{Arbitrary two-qubit unitary can be represented using $U_3$ and $CNOT$ gates
@@ -692,12 +697,7 @@ if __name__ == "__main__":
                     targ_name = "Random Circuits from [Clifford + T] Gate Set"
                     targ_name_lower_case = "random circuits from [Clifford + T] gate set"
                     with doc.create(Section(NoEscape(rf"Target: {targ_name}"))):
-                        doc.append(
-                            Subsection(
-                                r"""Metrics for each stage of compilation pipeline""",
-                                numbering=False,
-                            )
-                        )
+                        doc.append(Subsection(r"""Metrics for each stage of compilation pipeline""", numbering=False,))
                         doc.append(
                             NoEscape(
                                 r"""Note that in most cases single-qubit gate count and single-qubit gate compression 
@@ -708,20 +708,24 @@ if __name__ == "__main__":
                             )
                         )
                         with doc.create(Figure(position="h!")) as fig:
-                            filename = rf"output/figures/2qubit/{target}/{hardware}/bars_depth.png"
+                            filename = rf"output/figures/2qubit/{target}/{hardware}/bars_depth.{fig_format}"
                             filename = os.path.join(args.input_data_dir, filename)
                             filename = os.path.abspath(filename)
                             fig.add_image(filename, width=NoEscape(r"0.4\textwidth"))
-                            filename = rf"output/figures/2qubit/{target}/{hardware}/bars_single_qubit_gate_count.png"
+                            filename = (
+                                rf"output/figures/2qubit/{target}/{hardware}/bars_single_qubit_gate_count.{fig_format}"
+                            )
                             filename = os.path.join(args.input_data_dir, filename)
                             filename = os.path.abspath(filename)
                             fig.add_image(filename, width=NoEscape(r"0.4\textwidth"))
                             doc.append(LineBreak())
-                            filename = rf"output/figures/2qubit/{target}/{hardware}/bars_two_qubit_gate_count.png"
+                            filename = (
+                                rf"output/figures/2qubit/{target}/{hardware}/bars_two_qubit_gate_count.{fig_format}"
+                            )
                             filename = os.path.join(args.input_data_dir, filename)
                             filename = os.path.abspath(filename)
                             fig.add_image(filename, width=NoEscape(r"0.4\textwidth"))
-                            filename = rf"output/figures/2qubit/{target}/{hardware}/bars_total_gate_count.png"
+                            filename = rf"output/figures/2qubit/{target}/{hardware}/bars_total_gate_count.{fig_format}"
                             filename = os.path.join(args.input_data_dir, filename)
                             filename = os.path.abspath(filename)
                             fig.add_image(filename, width=NoEscape(r"0.4\textwidth"))
@@ -732,60 +736,53 @@ if __name__ == "__main__":
                                 )
                             )
 
-                    doc.append(Subsection(r"""Summary stats by pipeline (after final compilation stage)""",
-                                          numbering=False))
+                    doc.append(
+                        Subsection(r"""Summary stats by pipeline (after final compilation stage)""", numbering=False)
+                    )
                     # Here we show aggregated information on single-qubit, two-qubit gate count and total
                     # gate count before/after compression.
                     with doc.create(Itemize()) as itemize:
                         stage_id = final_stage
                         # TODO: Check that the output gate set = U1, U2, U3, CNOT (IbmAll2all)
                         df_mean = latex_report.groupby_framework_mean(stage_id, hardware, target)
-                        itemize.add_item(
-                            NoEscape(
-                                r"Min depth: \textbf{"
-                                + f"{df_mean['Depth'].idxmin()}" + r"}"
-                            )
-                        )
-                        itemize.add_item(
-                            NoEscape(
-                                r"Max depth: \textbf{"
-                                + f"{df_mean['Depth'].idxmax()}" + r"}"
-                            )
-                        )
+                        itemize.add_item(NoEscape(r"Min depth: \textbf{" + f"{df_mean['Depth'].idxmin()}" + r"}"))
+                        itemize.add_item(NoEscape(r"Max depth: \textbf{" + f"{df_mean['Depth'].idxmax()}" + r"}"))
                         itemize.add_item(
                             NoEscape(
                                 r"Min single-qubit gate count: \textbf{"
-                                + f"{df_mean['Single-Qubit Gate Count'].idxmin()}" + r"}"
+                                + f"{df_mean['Single-Qubit Gate Count'].idxmin()}"
+                                + r"}"
                             )
                         )
                         itemize.add_item(
                             NoEscape(
                                 r"Max single-qubit gate count: \textbf{"
-                                + f"{df_mean['Single-Qubit Gate Count'].idxmax()}" + r"}"
+                                + f"{df_mean['Single-Qubit Gate Count'].idxmax()}"
+                                + r"}"
                             )
                         )
                         itemize.add_item(
                             NoEscape(
                                 r"Min two-qubit gate count: \textbf{"
-                                + f"{df_mean['Two-Qubit Gate Count'].idxmin()}" + r"}"
+                                + f"{df_mean['Two-Qubit Gate Count'].idxmin()}"
+                                + r"}"
                             )
                         )
                         itemize.add_item(
                             NoEscape(
                                 r"Max two-qubit gate count: \textbf{"
-                                + f"{df_mean['Two-Qubit Gate Count'].idxmax()}" + r"}"
+                                + f"{df_mean['Two-Qubit Gate Count'].idxmax()}"
+                                + r"}"
                             )
                         )
                         itemize.add_item(
                             NoEscape(
-                                r"Min total gate count: \textbf{"
-                                + f"{df_mean['Total Gate Count'].idxmin()}" + r"}"
+                                r"Min total gate count: \textbf{" + f"{df_mean['Total Gate Count'].idxmin()}" + r"}"
                             )
                         )
                         itemize.add_item(
                             NoEscape(
-                                r"Max total gate count: \textbf{"
-                                + f"{df_mean['Total Gate Count'].idxmax()}" + r"}"
+                                r"Max total gate count: \textbf{" + f"{df_mean['Total Gate Count'].idxmax()}" + r"}"
                             )
                         )
     hardware_list = latex_report.get_not_kak_hardware_list()
@@ -808,15 +805,16 @@ if __name__ == "__main__":
             )
 
             with doc.create(Figure(position="h!")) as fig:
-                filename = f"output/figures/multiqubit/comp_radar_target_analysis_to_{final_stage}_grid.png"
+                filename = f"output/figures/multiqubit/comp_radar_target_analysis_to_{final_stage}_grid.{fig_format}"
                 filename = os.path.join(args.input_data_dir, filename)
                 filename = os.path.abspath(filename)
                 fig.add_image(filename, width=NoEscape(r"1.\textwidth"))
                 fig.add_caption(
                     NoEscape(
                         rf"""Aggregate multi-factor comparison of compilation frameworks: compression factor ($CF$)
-                        across various features. The x-axis corresponds to target, y-axis - hardware.
-                        Better performance corresponds to a larger polygon area."""
+                        across various features. Columns correspond to specific target circuit classes, and row 
+                        correspond to different hardware architectures. Better performance corresponds to a larger 
+                        polygon area."""
                     )
                 )
 
@@ -851,20 +849,24 @@ if __name__ == "__main__":
                     )
                 )
                 with doc.create(Figure(position="h!")) as fig:
-                    filename = rf"output/figures/{plot_group}/{target}/{hardware}/bars_depth.png"
+                    filename = rf"output/figures/{plot_group}/{target}/{hardware}/bars_depth.{fig_format}"
                     filename = os.path.join(args.input_data_dir, filename)
                     filename = os.path.abspath(filename)
                     fig.add_image(filename, width=NoEscape(r"0.4\textwidth"))
-                    filename = rf"output/figures/{plot_group}/{target}/{hardware}/bars_single_qubit_gate_count.png"
+                    filename = (
+                        rf"output/figures/{plot_group}/{target}/{hardware}/bars_single_qubit_gate_count.{fig_format}"
+                    )
                     filename = os.path.join(args.input_data_dir, filename)
                     filename = os.path.abspath(filename)
                     fig.add_image(filename, width=NoEscape(r"0.4\textwidth"))
                     doc.append(LineBreak())
-                    filename = rf"output/figures/{plot_group}/{target}/{hardware}/bars_two_qubit_gate_count.png"
+                    filename = (
+                        rf"output/figures/{plot_group}/{target}/{hardware}/bars_two_qubit_gate_count.{fig_format}"
+                    )
                     filename = os.path.join(args.input_data_dir, filename)
                     filename = os.path.abspath(filename)
                     fig.add_image(filename, width=NoEscape(r"0.4\textwidth"))
-                    filename = rf"output/figures/{plot_group}/{target}/{hardware}/bars_total_gate_count.png"
+                    filename = rf"output/figures/{plot_group}/{target}/{hardware}/bars_total_gate_count.{fig_format}"
                     filename = os.path.join(args.input_data_dir, filename)
                     filename = os.path.abspath(filename)
                     fig.add_image(filename, width=NoEscape(r"0.4\textwidth"))
@@ -878,7 +880,7 @@ if __name__ == "__main__":
 
                     filename = (
                         rf"output/figures/{plot_group}/{target}/{hardware}/"
-                        rf"compression_target_analysis_to_{final_stage}.png"
+                        rf"compression_target_analysis_to_{final_stage}.{fig_format}"
                     )
                     filename = os.path.join(args.input_data_dir, filename)
                     filename = os.path.abspath(filename)
@@ -886,7 +888,7 @@ if __name__ == "__main__":
 
                     filename = (
                         rf"output/figures/{plot_group}/{target}/{hardware}/"
-                        rf"comp_radar_target_analysis_to_{final_stage}.png"
+                        rf"comp_radar_target_analysis_to_{final_stage}.{fig_format}"
                     )
                     filename = os.path.join(args.input_data_dir, filename)
                     filename = os.path.abspath(filename)
@@ -909,7 +911,7 @@ if __name__ == "__main__":
                     for i, framework in enumerate(frameworks):
                         filename = (
                             f"output/figures/{plot_group}/{target}/{hardware}/"
-                            f"gate_composition_heatmap_{framework.lower()}.png"
+                            f"gate_composition_heatmap_{framework.lower()}.{fig_format}"
                         )
                         filename = os.path.join(args.input_data_dir, filename)
                         filename = os.path.abspath(filename)
@@ -929,78 +931,53 @@ if __name__ == "__main__":
                     )
                 )
                 with doc.create(Figure(position="h!")) as fig:
-                    filename = rf"output/figures/{plot_group}/{target}/{hardware}/bars_execution_time.png"
+                    filename = rf"output/figures/{plot_group}/{target}/{hardware}/bars_execution_time.{fig_format}"
                     filename = os.path.join(args.input_data_dir, filename)
                     filename = os.path.abspath(filename)
                     fig.add_image(filename, width=NoEscape(r"0.45\textwidth"))
                     fig.add_caption(NoEscape(f"""Mean execution time of each compilation stage for {hardware}."""))
-                doc.append(Subsection(r"Summary stats (averaged over target circuits) by"
-                                      r" pipeline", numbering=False))
+                doc.append(
+                    Subsection(r"Summary stats (averaged over target circuits) by" r" pipeline", numbering=False)
+                )
                 # Here we show aggregated information on single-qubit, two-qubit gate count
                 # and total gate count before/after compression.
                 with doc.create(Itemize()) as itemize:
                     stage_id = final_stage
                     df_mean = latex_report.groupby_framework_mean(stage_id, hardware, target)
-                    itemize.add_item(
-                        NoEscape(
-                            r"Min depth: \textbf{"
-                            + f"{df_mean['Depth'].idxmin()}" + r"}"
-                        )
-                    )
-                    itemize.add_item(
-                        NoEscape(
-                            r"Max depth: \textbf{"
-                            + f"{df_mean['Depth'].idxmax()}" + r"}"
-                        )
-                    )
+                    itemize.add_item(NoEscape(r"Min depth: \textbf{" + f"{df_mean['Depth'].idxmin()}" + r"}"))
+                    itemize.add_item(NoEscape(r"Max depth: \textbf{" + f"{df_mean['Depth'].idxmax()}" + r"}"))
                     itemize.add_item(
                         NoEscape(
                             r"Min single-qubit gate count: \textbf{"
-                            + f"{df_mean['Single-Qubit Gate Count'].idxmin()}" + r"}"
+                            + f"{df_mean['Single-Qubit Gate Count'].idxmin()}"
+                            + r"}"
                         )
                     )
                     itemize.add_item(
                         NoEscape(
                             r"Max single-qubit gate count: \textbf{"
-                            + f"{df_mean['Single-Qubit Gate Count'].idxmax()}" + r"}"
+                            + f"{df_mean['Single-Qubit Gate Count'].idxmax()}"
+                            + r"}"
                         )
                     )
                     itemize.add_item(
                         NoEscape(
-                            r"Min two-qubit gate count: \textbf{"
-                            + f"{df_mean['Two-Qubit Gate Count'].idxmin()}" + r"}"
+                            r"Min two-qubit gate count: \textbf{" + f"{df_mean['Two-Qubit Gate Count'].idxmin()}" + r"}"
                         )
                     )
                     itemize.add_item(
                         NoEscape(
-                            r"Max two-qubit gate count: \textbf{"
-                            + f"{df_mean['Two-Qubit Gate Count'].idxmax()}" + r"}"
+                            r"Max two-qubit gate count: \textbf{" + f"{df_mean['Two-Qubit Gate Count'].idxmax()}" + r"}"
                         )
                     )
                     itemize.add_item(
-                        NoEscape(
-                            r"Min total gate count: \textbf{"
-                            + f"{df_mean['Total Gate Count'].idxmin()}" + r"}"
-                        )
+                        NoEscape(r"Min total gate count: \textbf{" + f"{df_mean['Total Gate Count'].idxmin()}" + r"}")
                     )
                     itemize.add_item(
-                        NoEscape(
-                            r"Max total gate count: \textbf{"
-                            + f"{df_mean['Total Gate Count'].idxmax()}" + r"}"
-                        )
+                        NoEscape(r"Max total gate count: \textbf{" + f"{df_mean['Total Gate Count'].idxmax()}" + r"}")
                     )
-                    itemize.add_item(
-                        NoEscape(
-                            r"Min execution time: \textbf{"
-                            + f"{frmwrk_min_exec_time}" + r"}"
-                        )
-                    )
-                    itemize.add_item(
-                        NoEscape(
-                            r"Max execution time: \textbf{"
-                            + f"{frmwrk_max_exec_time}" + r"}"
-                        )
-                    )
+                    itemize.add_item(NoEscape(r"Min execution time: \textbf{" + f"{frmwrk_min_exec_time}" + r"}"))
+                    itemize.add_item(NoEscape(r"Max execution time: \textbf{" + f"{frmwrk_max_exec_time}" + r"}"))
                 doc.append(Subsection(r"""Cluster analytics """, numbering=False))
                 doc.append(
                     NoEscape(
@@ -1011,14 +988,14 @@ if __name__ == "__main__":
                 with doc.create(Figure(position="h!")) as fig:
                     filename = (
                         rf"output/figures/{plot_group}/{target}/{hardware}/"
-                        rf"scatter_two_qubit_gate_count_vs_single_qubit_gate_count.png"
+                        rf"scatter_two_qubit_gate_count_vs_single_qubit_gate_count.{fig_format}"
                     )
                     filename = os.path.join(args.input_data_dir, filename)
                     filename = os.path.abspath(filename)
                     fig.add_image(filename, width=NoEscape(r"0.4\textwidth"))
                     filename = (
                         rf"output/figures/{plot_group}/{target}/{hardware}/"
-                        rf"scatter_two_qubit_gate_count_vs_depth.png"
+                        rf"scatter_two_qubit_gate_count_vs_depth.{fig_format}"
                     )
                     filename = os.path.join(args.input_data_dir, filename)
                     filename = os.path.abspath(filename)
@@ -1026,14 +1003,14 @@ if __name__ == "__main__":
                     doc.append(LineBreak())
                     filename = (
                         rf"output/figures/{plot_group}/{target}/"
-                        rf"{hardware}/scatter_total_gate_count_vs_depth.png"
+                        rf"{hardware}/scatter_total_gate_count_vs_depth.{fig_format}"
                     )
                     filename = os.path.join(args.input_data_dir, filename)
                     filename = os.path.abspath(filename)
                     fig.add_image(filename, width=NoEscape(r"0.4\textwidth"))
                     filename = (
                         rf"output/figures/{plot_group}/{target}/{hardware}/"
-                        rf"scatter_execution_time_vs_input_depth.png"
+                        rf"scatter_execution_time_vs_input_depth.{fig_format}"
                     )
                     filename = os.path.join(args.input_data_dir, filename)
                     filename = os.path.abspath(filename)
@@ -1049,14 +1026,14 @@ if __name__ == "__main__":
                 with doc.create(Figure(position="h!")) as fig:
                     filename = (
                         rf"output/figures/{plot_group}/{target}/{hardware}/"
-                        rf"comp_heatmap_depth_target_analysis_to_{final_stage}.png"
+                        rf"comp_heatmap_depth_target_analysis_to_{final_stage}.{fig_format}"
                     )
                     filename = os.path.join(args.input_data_dir, filename)
                     filename = os.path.abspath(filename)
                     fig.add_image(filename, width=NoEscape(r"0.35\textwidth"))
                     filename = (
                         rf"output/figures/{plot_group}/{target}/{hardware}/"
-                        rf"comp_heatmap_single_qubit_gate_count_target_analysis_to_{final_stage}.png"
+                        rf"comp_heatmap_single_qubit_gate_count_target_analysis_to_{final_stage}.{fig_format}"
                     )
                     filename = os.path.join(args.input_data_dir, filename)
                     filename = os.path.abspath(filename)
@@ -1064,35 +1041,27 @@ if __name__ == "__main__":
                     doc.append(LineBreak())
                     filename = (
                         rf"output/figures/{plot_group}/{target}/{hardware}/"
-                        rf"comp_heatmap_two_qubit_gate_count_target_analysis_to_{final_stage}.png"
+                        rf"comp_heatmap_two_qubit_gate_count_target_analysis_to_{final_stage}.{fig_format}"
                     )
                     filename = os.path.join(args.input_data_dir, filename)
                     filename = os.path.abspath(filename)
                     fig.add_image(filename, width=NoEscape(r"0.35\textwidth"))
                     filename = (
                         rf"output/figures/{plot_group}/{target}/{hardware}/"
-                        rf"comp_heatmap_total_gate_count_target_analysis_to_{final_stage}.png"
+                        rf"comp_heatmap_total_gate_count_target_analysis_to_{final_stage}.{fig_format}"
                     )
                     filename = os.path.join(args.input_data_dir, filename)
                     filename = os.path.abspath(filename)
                     fig.add_image(filename, width=NoEscape(r"0.35\textwidth"))
-                    fig.add_caption(
-                        NoEscape(
-                            rf"""Compression factor ($CF$) vs circuit for {hardware}."""
-                        )
-                    )
+                    fig.add_caption(NoEscape(rf"""Compression factor ($CF$) vs circuit for {hardware}."""))
                 with doc.create(Itemize()) as itemize:
                     stage_id = final_stage
 
-                    val, circ, pip = latex_report.min_result_by_feature(
-                        "Depth", stage_id, hardware, target
-                    )
+                    val, circ, pip = latex_report.min_result_by_feature("Depth", stage_id, hardware, target)
                     itemize.add_item(f"Circuit id: {circ} ")
                     doc.append(NoEscape(r"with min final depth: \textbf{" + f"{val}" + r"}"))
 
-                    val, circ, pip = latex_report.max_result_by_feature(
-                        "Depth", stage_id, hardware, target
-                    )
+                    val, circ, pip = latex_report.max_result_by_feature("Depth", stage_id, hardware, target)
                     itemize.add_item(f"Circuit id: {circ} ")
                     doc.append(NoEscape(r"with max final depth: \textbf{" + f"{val}" + r"}"))
 
@@ -1120,15 +1089,11 @@ if __name__ == "__main__":
                     itemize.add_item(f"Circuit id: {circ} ")
                     doc.append(NoEscape(r"with max final two-qubit gate count: \textbf{" + f"{val}" + r"}"))
 
-                    val, circ, pip = latex_report.min_result_by_feature(
-                        "Total Gate Count", stage_id, hardware, target
-                    )
+                    val, circ, pip = latex_report.min_result_by_feature("Total Gate Count", stage_id, hardware, target)
                     itemize.add_item(f"Circuit id: {circ} ")
                     doc.append(NoEscape(r"with min final total gate count: \textbf{" + f"{val}" + r"}"))
 
-                    val, circ, pip = latex_report.max_result_by_feature(
-                        "Total Gate Count", stage_id, hardware, target
-                    )
+                    val, circ, pip = latex_report.max_result_by_feature("Total Gate Count", stage_id, hardware, target)
                     itemize.add_item(f"Circuit id: {circ} ")
                     doc.append(NoEscape(r"with max final total gate count: \textbf{" + f"{val}" + r"}"))
 
@@ -1161,15 +1126,13 @@ if __name__ == "__main__":
                     itemize.add_item(NoEscape(r"Max average two-qubit gate count: " + r"\textbf{" + idx[0] + r"}"))
 
                 with doc.create(Figure(position="h!")) as fig:
-                    filename = (
-                        f"output/figures/multiqubit/{target}/comp_heatmap_depth_target_analysis_to_{final_stage}.png"
-                    )
+                    filename = f"output/figures/multiqubit/{target}/comp_heatmap_depth_target_analysis_to_{final_stage}.{fig_format}"
                     filename = os.path.join(args.input_data_dir, filename)
                     filename = os.path.abspath(filename)
                     fig.add_image(filename, width=NoEscape(r"0.5\textwidth"))
                     filename = (
                         f"output/figures/multiqubit/{target}/"
-                        f"comp_heatmap_single_qubit_gate_count_target_analysis_to_{final_stage}.png"
+                        f"comp_heatmap_single_qubit_gate_count_target_analysis_to_{final_stage}.{fig_format}"
                     )
                     filename = os.path.join(args.input_data_dir, filename)
                     filename = os.path.abspath(filename)
@@ -1177,23 +1140,19 @@ if __name__ == "__main__":
                     doc.append(LineBreak())
                     filename = (
                         f"output/figures/multiqubit/{target}/"
-                        f"comp_heatmap_two_qubit_gate_count_target_analysis_to_{final_stage}.png"
+                        f"comp_heatmap_two_qubit_gate_count_target_analysis_to_{final_stage}.{fig_format}"
                     )
                     filename = os.path.join(args.input_data_dir, filename)
                     filename = os.path.abspath(filename)
                     fig.add_image(filename, width=NoEscape(r"0.5\textwidth"))
                     filename = (
                         f"output/figures/multiqubit/{target}/"
-                        f"comp_heatmap_total_gate_count_target_analysis_to_{final_stage}.png"
+                        f"comp_heatmap_total_gate_count_target_analysis_to_{final_stage}.{fig_format}"
                     )
                     filename = os.path.join(args.input_data_dir, filename)
                     filename = os.path.abspath(filename)
                     fig.add_image(filename, width=NoEscape(r"0.5\textwidth"))
-                    fig.add_caption(
-                        NoEscape(
-                            r"""Final circuit metrics after compilation vs hardware backend."""
-                        )
-                    )
+                    fig.add_caption(NoEscape(r"""Final circuit metrics after compilation vs hardware backend."""))
     doc.append(NewPage())
     doc.append(Chapter("References", numbering=False))
     with doc.create(Itemize()) as itemize:

@@ -87,7 +87,7 @@ class BenchmarkPlotter:
                     print(f"Error occurred when plotting {title}:", file=sys.stderr)
                     traceback.print_exc(file=sys.stderr)
                     print("Plot config:", file=sys.stderr)
-                    pprint(plot_cfg, stream=sys.stderr)
+                    print(plot_cfg, stream=sys.stderr)
                 # save
                 filename = plot_cfg["filename"].format(**comb_conditions, **plot_cfg["additional_args"])
                 filename = path.join(
@@ -98,7 +98,7 @@ class BenchmarkPlotter:
                 makedirs(path.dirname(full_path), exist_ok=True)
                 if path.exists(full_path):
                     print(f"Warning: file {filename} already exists!")
-                plt.savefig(full_path, dpi=self.dpi, bbox_inches="tight")
+                plt.savefig(full_path, dpi=self.dpi, bbox_inches="tight", format="pdf")
                 plt.close()
 
     def plot_pipelines_comparison_bars(
