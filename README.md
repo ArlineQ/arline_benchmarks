@@ -6,10 +6,10 @@ each other on a list of predefined hardware types and target circuit classes.
 ## Demo (report generation preview)
 
 ### Benchmarking run
-![Benchmarking run](https://media.giphy.com/media/W3eXiS5JQ73zSKRy2q/source.gif)
+![Benchmarking run](https://media.giphy.com/media/KGSkRQySKxYl201QqQ/source.gif)
 
 ### LaTeX report
-![Report](https://media.giphy.com/media/S9twlidRrhyRJMSu4G/source.gif)
+![Report](https://media.giphy.com/media/YlB8gwfvSmN2Nl6ALx/source.gif)
 
 ## List of supported compilation frameworks
 
