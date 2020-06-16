@@ -9,7 +9,7 @@ each other on a list of predefined hardware types and target circuit classes.
 ![Benchmarking run](https://media.giphy.com/media/KGSkRQySKxYl201QqQ/source.gif)
 
 ### LaTeX report
-![Report](https://media.giphy.com/media/YlB8gwfvSmN2Nl6ALx/source.gif)
+![Report](https://media.giphy.com/media/ejJgh5eHfHXqi57DB4/source.gif)
 
 ## List of supported compilation frameworks
 
