@@ -597,7 +597,7 @@ if __name__ == "__main__":
         with doc.create(Section("System Info")):
             with doc.create(Itemize()) as itemize:
                 itemize.add_item(f"Platform: {platform.platform(aliased=1)}")
-                itemize.add_item(f"Processor: {cpuinfo.get_cpu_info()['brand']}")
+                itemize.add_item(f"Processor: {cpuinfo.get_cpu_info()['brand_raw']}")
                 memory = virtual_memory().total / 2 ** 30
                 itemize.add_item(f"Memory: {round(memory, 1)} Gb")
 
