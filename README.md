@@ -3,7 +3,7 @@
 **Arline Benchmarks** platform allows to benchmark various algorithms for quantum circuit mapping/compression against
 each other on a list of predefined hardware types and target circuit classes.
 
-Arline benchmarking platform has been recently used by Oxford Quantum Circuits team (see ![blog post](https://oxfordquantumcircuits.com/oqc-integrates-tket)) for compiler performance testing.
+Arline Benchmarks has been recently used by Oxford Quantum Circuits team for compiler performance testing (see [blog post](https://oxfordquantumcircuits.com/oqc-integrates-tket)).
 
 ## Demo (report generation preview)
 
@@ -206,4 +206,4 @@ arline_benchmarks
 
 ## Contributors
 
-**Turation team**: Yaroslav Kharkov, Eugeny Mikhentiev, Alina Ivanova, Alex Kotelnikov
+**Arline team**: Yaroslav Kharkov, Eugeny Mikhentiev, Alina Ivanova, Alex Kotelnikov
