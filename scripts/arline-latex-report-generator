@@ -371,7 +371,7 @@ if __name__ == "__main__":
                 computation.\bigskip
 
                 \noindent{The importance of optimal quantum compilation stems from the fact that noisy
-                intermediate-scale quantum (NISQ) devices suffer from unavoidable noise caused by individual gates. 
+                intermediate-scale quantum (NISQ) devices suffer from unavoidable noise caused by individual gates.
                 Extreme susceptibility of quantum computation to noise is the crucial problem that hinders
                 the development of large-scale quantum computers. By the means of optimising gate count in the quantum
                 circuit, it is possible to significantly reduce hardware errors.} \bigskip
@@ -383,12 +383,12 @@ if __name__ == "__main__":
                 of the efficient compilation algorithm, that is used in practical applications.} \bigskip
 
                 \noindent{Subroutines for quantum circuit optimisation, mapping and routing for particular
-                hardware connectivity are an integral part of existing quantum software frameworks. The complexity 
-                and diversity of various quantum compilation algorithms create a necessity of cross-benchmarking and 
-                comparison between different compiler frameworks. It worth to note, that the problem of hardware 
-                benchmarking often arises in classical computing, where hardware is compared based on their 
+                hardware connectivity are an integral part of existing quantum software frameworks. The complexity
+                and diversity of various quantum compilation algorithms create a necessity of cross-benchmarking and
+                comparison between different compiler frameworks. It worth to note, that the problem of hardware
+                benchmarking often arises in classical computing, where hardware is compared based on their
                 performance on a set of predefined tests.} \\ \\ \bigskip
-                
+
                 \noindent{Arline Benchmarks}\footnotemark"""
             )
         )
@@ -441,9 +441,9 @@ if __name__ == "__main__":
                         NoEscape(
                             f"""v{version('qiskit')} (open-source)."""
                             + r"""
-                            \textbf{Qiskit} is an open-source framework for working with quantum computers at the 
-                            level of circuits, pulses, and algorithms. Qiskit transpiler combines mapping and 
-                            compression subroutines. The transpiler has three levels of optimization, in our report, 
+                            \textbf{Qiskit} is an open-source framework for working with quantum computers at the
+                            level of circuits, pulses, and algorithms. Qiskit transpiler combines mapping and
+                            compression subroutines. The transpiler has three levels of optimization, in our report,
                             we invoke the most advanced optimization level (3)."""
                         )
                     )
@@ -457,7 +457,7 @@ if __name__ == "__main__":
                         )
                         itemize2.add_item(
                             NoEscape(
-                                r"""Routing and mapping algorithms are based on construction of a 
+                                r"""Routing and mapping algorithms are based on construction of a
                                 \textbf{basic, stochastic or lookahead swap network.}"""
                             )
                         )
@@ -484,7 +484,7 @@ if __name__ == "__main__":
                         )
                         itemize2.add_item(
                             NoEscape(
-                                r"""Routing and mapping methods are based on a \textbf{greedy swap insertion 
+                                r"""Routing and mapping methods are based on a \textbf{greedy swap insertion
                                 strategy.}"""
                             )
                         )
@@ -597,7 +597,7 @@ if __name__ == "__main__":
         with doc.create(Section("System Info")):
             with doc.create(Itemize()) as itemize:
                 itemize.add_item(f"Platform: {platform.platform(aliased=1)}")
-                itemize.add_item(f"Processor: {cpuinfo.get_cpu_info()['brand']}")
+                itemize.add_item(f"Processor: {cpuinfo.get_cpu_info()['brand_raw']}")
                 memory = virtual_memory().total / 2 ** 30
                 itemize.add_item(f"Memory: {round(memory, 1)} Gb")
 
@@ -700,10 +700,10 @@ if __name__ == "__main__":
                         doc.append(Subsection(r"""Metrics for each stage of compilation pipeline""", numbering=False,))
                         doc.append(
                             NoEscape(
-                                r"""Note that in most cases single-qubit gate count and single-qubit gate compression 
+                                r"""Note that in most cases single-qubit gate count and single-qubit gate compression
                                 factor have only limited meaning as a metric of compiler performance.
                                 This is because single-qubit gate count is very sensitive to the choice single-qubit
-                                basis gates (e.g. $U_3$ is equivalent to a combination of 3 rotation gates $R_x$, 
+                                basis gates (e.g. $U_3$ is equivalent to a combination of 3 rotation gates $R_x$,
                                 $R_y$ and $R_z$)."""
                             )
                         )
@@ -793,11 +793,11 @@ if __name__ == "__main__":
             doc.append(
                 NoEscape(
                     r"""This analysis is performed across all compilation frameworks, target circuits and hardware.
-                    From this result, we can deduce the degree of compressibility of different target 
+                    From this result, we can deduce the degree of compressibility of different target
                     circuits. \bigskip
-                    
-                    \noindent{Note that in most cases single-qubit gate count and single-qubit gate compression 
-                    factor have only limited meaning as a metric of compiler performance. This is because 
+
+                    \noindent{Note that in most cases single-qubit gate count and single-qubit gate compression
+                    factor have only limited meaning as a metric of compiler performance. This is because
                     single-qubit gate count is very sensitive to the choice single-qubit basis gates
                     (e.g. $U_3$ is equivalent to a combination of 3 rotation gates $R_x$, $R_y$ and $R_z$).}
                     """
@@ -812,8 +812,8 @@ if __name__ == "__main__":
                 fig.add_caption(
                     NoEscape(
                         rf"""Aggregate multi-factor comparison of compilation frameworks: compression factor ($CF$)
-                        across various features. Columns correspond to specific target circuit classes, and row 
-                        correspond to different hardware architectures. Better performance corresponds to a larger 
+                        across various features. Columns correspond to specific target circuit classes, and row
+                        correspond to different hardware architectures. Better performance corresponds to a larger
                         polygon area."""
                     )
                 )
@@ -834,7 +834,7 @@ if __name__ == "__main__":
                 doc.append(
                     Subsection(
                         NoEscape(
-                            r"""Metrics for each stage of compilation pipeline and aggregate compression factor 
+                            r"""Metrics for each stage of compilation pipeline and aggregate compression factor
                             (initial/final)"""
                         ),
                         numbering=False,
@@ -1159,7 +1159,7 @@ if __name__ == "__main__":
         if is_kak_hardware:
             itemize.add_item(
                 NoEscape(
-                    r""" G. Vidal and C.M. Dawson, “A universal quantum circuit for two-qubit 
+                    r""" G. Vidal and C.M. Dawson, “A universal quantum circuit for two-qubit
                     transformations with three CNOT gates”, Phys. Rev. A 69, 010301 (2004),  """
                 )
             )
