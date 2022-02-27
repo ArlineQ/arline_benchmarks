@@ -15,7 +15,7 @@ Arline Benchmarks has been recently used by Oxford Quantum Circuits team for com
 
 ## List of supported compilation frameworks
 
-* [Google Cirq](https://github.com/quantumlib/Cirq)
+* [Google Cirq library](https://github.com/quantumlib/Cirq)
 * [IBM Qiskit](https://github.com/Qiskit)
 
 ## Installation
