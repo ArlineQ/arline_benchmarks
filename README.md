@@ -15,8 +15,11 @@ Arline Benchmarks has been recently used by Oxford Quantum Circuits team for com
 
 ## List of supported compilation frameworks
 
-* [Google Cirq library](https://github.com/quantumlib/Cirq)
+* [Google Cirq](https://github.com/quantumlib/Cirq)
 * [IBM Qiskit](https://github.com/Qiskit)
+* [CQC Tket](https://github.com/CQCL/tket)
+* [PyZX](https://github.com/Quantomatic/pyzx)
+* [VOQC](https://github.com/inQWIRE/pyvoqc)
 
 ## Installation
 
@@ -56,6 +59,17 @@ Alternatively, Arline Benchmarks can be installed in the editable mode:
 
 ```console
 $ pip3 install -e .
+```
+
+### VOQC installation
+
+To install Python wrapper for VOQC package follow [instructions](https://github.com/inQWIRE/pyvoqc).
+
+### Setting Environment Variables
+
+Add to your `~/.profile`:
+```bash
+export ARLINE_BENCHMARKS=<full path to arline_benchmarks repository>
 ```
 
 ### TeXLive installation
@@ -206,4 +220,4 @@ arline_benchmarks
 
 ## Contributors
 
-**Arline team**: Yaroslav Kharkov, Eugeny Mikhentiev, Alina Ivanova, Alex Kotelnikov
+**Arline team**: Yaroslav Kharkov, Eugeny Mikhantyev, Alina Ivanova, Alex Kotelnikov

@@ -18,23 +18,21 @@
 
 
 import argparse
-import sys
-
-from arline_benchmarks.config_parser.pipeline_config_parser import PipelineConfigParser
-from arline_benchmarks.engines.pipeline_engine import PipelineEngine
+from arline_benchmarks.reports.latex_report import LatexReport
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Run Benchmark Engine", add_help=True)
-    parser.add_argument("--config", "-c", type=str, required=True, help="Configuration", default=None)
-    parser.add_argument("--output", "-o", type=str, required=True, help="Output directory")
-    parser.add_argument("--visualize", "-v", action="store_true", help="Print stats in terminal")  # TODO check result
+    from arline_benchmarks.config_parser.pipeline_config_parser import PipelineConfigParser
+
+    parser = argparse.ArgumentParser(description="Plot curves", formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser.add_argument("--input_dir", "-i", type=str, help="Directory with generated benchmark data")
+    parser.add_argument("--output_dir", "-o", type=str, help="Directory for Latex output")
+    parser.add_argument("--config", "-j", type=str, help="Jsonnet config", required=True)
     args = parser.parse_args()
 
-    cfg = PipelineConfigParser(args.config)
-    engine = PipelineEngine(cfg, args)
-    exit_code = engine.run()
-    sys.exit(exit_code)
+    config = PipelineConfigParser(args.config)
+    latex_report = LatexReport(input_dir=args.input_dir, output_dir=args.output_dir, config=config)
+    latex_report.generate_report()
 
 
 if __name__ == "__main__":
