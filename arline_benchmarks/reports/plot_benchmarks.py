@@ -15,7 +15,6 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-import argparse
 import re
 import sys
 import traceback
@@ -30,6 +29,7 @@ from pprint import pprint
 from contextlib import suppress
 from os import makedirs, path
 
+from arline_quantum.hardware import hardware_by_name
 
 matplotlib.use("Agg")
 
@@ -68,8 +68,8 @@ class BenchmarkPlotter:
     def plot(self):
         for plot_cfg in tqdm(self.config["plotter"]["plots"]):
             fixed_conditions = plot_cfg["fixed_conditions"]
-            iterative_conditions = plot_cfg["iterative_conditions"]
             df = self.filter_condition(self.data, fixed_conditions)
+            iterative_conditions = plot_cfg["iterative_conditions"]
             condition_combinations = df[iterative_conditions].drop_duplicates().to_dict("records")
 
             for cc in condition_combinations:
@@ -79,17 +79,17 @@ class BenchmarkPlotter:
                 selected_data = self.filter_condition(df, cc)
                 title = None
                 if plot_cfg["title"] is not None:
-                    title = plot_cfg["title"].format(**comb_conditions, **plot_cfg["additional_args"])
+                    title = plot_cfg["title"].format(**comb_conditions, **plot_cfg["args"])
                 plot_function = getattr(self, plot_cfg["plot_function"])
                 try:
-                    plot_function(data=selected_data, title=title, **plot_cfg["additional_args"])
+                    plot_function(data=selected_data, title=title, **plot_cfg["args"])
                 except Exception as e:
                     print(f"Error occurred when plotting {title}:", file=sys.stderr)
                     traceback.print_exc(file=sys.stderr)
                     print("Plot config:", file=sys.stderr)
                     pprint(plot_cfg, stream=sys.stderr)
                 # save
-                filename = plot_cfg["filename"].format(**comb_conditions, **plot_cfg["additional_args"])
+                filename = plot_cfg["filename"].format(**comb_conditions, **plot_cfg["args"])
                 filename = path.join(
                     path.dirname(filename), path.basename(filename).replace(" ", "_").replace("-", "_").lower()
                 )  # Consistent file names
@@ -98,52 +98,102 @@ class BenchmarkPlotter:
                 makedirs(path.dirname(full_path), exist_ok=True)
                 if path.exists(full_path):
                     print(f"Warning: file {filename} already exists!")
-                plt.savefig(full_path, dpi=self.dpi, bbox_inches="tight", format="pdf")
+                plt.savefig(full_path, dpi=self.dpi, bbox_inches="tight")
                 plt.close()
 
     def plot_pipelines_comparison_bars(
-        self, data, y_col, pipelines_settings, stages_settings, baselines={}, title=None, yscale="linear"
+        self, data, y_col, pipelines_settings, stages_settings, baseline={}, title=None, yscale="linear"
     ):
         sns.set(style="darkgrid", font_scale=1.5)
 
-        # Filter stages and prepare 'Stage' column
-        data = data[data["Stage ID"].isin(stages_settings.keys())]
-        data["Stage"] = data["Stage ID"].map({s: d["name"] for s, d in stages_settings.items()})
-
-        # Filter pipelines and prepare 'Pipeline' column
-        data = data[data["Pipeline ID"].isin(pipelines_settings.keys())]
+        # Prepare "Stage" and "Pipeline" columns
+        # data["Stage"] = data["Stage ID"].map({s: d["name"] for s, d in stages_settings.items()})
         data["Pipeline"] = data["Pipeline ID"].map({s: d["name"] for s, d in pipelines_settings.items()})
+
+        # Filter stages
+        data = data[data["Stage ID"].isin(stages_settings.keys())]
+
+        # Filter pipelines
+        data = data[data["Pipeline ID"].isin(pipelines_settings.keys())]
 
         pallete = {d["name"]: d["color"] for n, d in stages_settings.items()}
 
         if len(data) == 0:
             raise Exception("No data in CSV")
 
-        g = sns.catplot(
-            x="Pipeline",
-            y=y_col,
-            hue="Stage",
-            data=data,
-            height=8,
-            kind="bar",
-            alpha=0.5,
-            palette=pallete,
-            legend_out=True,
-        )
-        g.set(yscale=yscale)
+        x = []
+        y = []
+        color = []
+        stage_names = []
+        pipeline_x = []
+        pipeline_names = []
+        errors = []
+
+        i = 0
+        for pl in data["Pipeline"].unique():
+            pipeline_names.append(pl)
+            pl_df = data[data["Pipeline"] == pl]
+            stages = pl_df["Stage ID"].unique()
+
+            pipeline_x.append(i + len(stages) / 2)
+
+            for stage in stages:
+                x.append(i)
+                y.append(pl_df[pl_df["Stage ID"] == stage][y_col].mean())
+                errors.append(pl_df[pl_df["Stage ID"] == stage][y_col].std())
+                color.append(stages_settings[stage]["color"])
+                stage_names.append(stages_settings[stage]["name"])
+                i += 1
+            i += 2
+
+        x = np.array(x)
+        y = np.array(y)
+        color = np.array(color)
+        stage_names = np.array(stage_names)
+        pipeline_x = np.array(pipeline_x)
+        pipeline_names = np.array(pipeline_names)
+        errors = np.array(errors)
+
+        for st, st_cfg in stages_settings.items():
+            st_mask = stage_names == st_cfg["name"]
+            g = plt.bar(
+                x[st_mask],
+                y[st_mask],
+                color=color[st_mask],
+                width=1,
+                edgecolor="white",
+                label=st_cfg["name"],
+                alpha=0.5,
+                yerr=errors[st_mask],
+            )
+
+        plt.grid(axis="x", b=None)
+        plt.grid(axis="y", which="minor", color="w", linestyle="-", linewidth=0.5)
+        plt.grid(axis="y", which="major", color="w", linestyle="-", linewidth=1)
+
+        plt.xticks(pipeline_x, pipeline_names)
+        plt.gca().set_yscale(yscale)
+
+        plt.legend(loc="center left", bbox_to_anchor=(1, 0.5), fancybox=False, framealpha=0, title="Stages")
+
+        plt.xlabel("Pipeline")
+        plt.ylabel(y_col)
 
         if title is not None:
             plt.suptitle(title, fontweight="bold")
             plt.subplots_adjust(top=0.9)
 
-        g.despine(left=True, bottom=False)
-        g.set_ylabels(y_col)
-
-        for bl_name, bl_cfg in baselines.items():
-            plt.hlines(bl_cfg["value"], *g.ax.get_xlim(), **bl_cfg["style"], label=bl_name)
+        if baseline:
+            plt.hlines(
+                baseline["value"],
+                plt.gca().get_xlim()[0],
+                plt.gca().get_xlim()[1],
+                **baseline["style"],
+                label=baseline["name"],
+            )
 
     def plot_scatter(
-        self, data, x_col, y_col, input_stage=None, output_stage=None, pipelines_settings={}, baselines={}, title=None,
+        self, data, x_col, y_col, input_stage=None, output_stage=None, pipelines_settings={}, baseline={}, title=None,
     ):
         sns.set(style="darkgrid", font_scale=1.5)
 
@@ -164,7 +214,6 @@ class BenchmarkPlotter:
             data_history = pd.concat([data_history, input_df], axis=1)
 
         data = data_history
-
         pallete = {d["name"]: d["color"] for n, d in pipelines_settings.items()}
 
         if len(data) == 0:
@@ -177,8 +226,8 @@ class BenchmarkPlotter:
             plt.suptitle(title, fontweight="bold")
             plt.subplots_adjust(top=0.9)
 
-        for bl_name, bl_cfg in baselines.items():
-            plt.hlines(bl_cfg["value"], *g.ax.get_xlim(), **bl_cfg["style"], label=bl_name)
+        if baseline:
+            plt.hlines(baseline["value"], *g.ax.get_xlim(), **baseline["style"], label=baseline["name"])
 
     def plot_compression_heatmap(
         self,
@@ -210,8 +259,10 @@ class BenchmarkPlotter:
         if len(heat_df) == 0:
             raise Exception("No data in CSV")
 
-        cmap = sns.diverging_palette(220, 10, as_cmap=True)
-        g = sns.heatmap(heat_df, cmap=cmap, linewidths=0.5, center=1, cbar_kws={"shrink": 1.0}, square=False, alpha=0.5)
+        cmap = "Purples"
+        g = sns.heatmap(
+            heat_df, cmap=cmap, linewidths=0.5, center=1, cbar_kws={"shrink": 1.0}, square=False, alpha=1.0,
+        )
         plt.ylim(0, len(heat_df.index))
 
         if row_label is None:
@@ -226,8 +277,8 @@ class BenchmarkPlotter:
 
     def plot_gate_composition(self, data, stages_settings, title=None):
         # Filter stages and prepare 'Stage' column
-        data = data[data["Stage ID"].isin(stages_settings.keys())]
         data["Stage"] = data["Stage ID"].map({s: d["name"] for s, d in stages_settings.items()})
+        data = data[data["Stage ID"].isin(stages_settings.keys())]
 
         df = data.reset_index().groupby(by="Stage").aggregate(np.sum)
         df = df.reset_index()
@@ -239,15 +290,18 @@ class BenchmarkPlotter:
 
         old_g_names = g_count_sum.columns
         g_names = [re.search("Count of (.*) Gates", g).group(1) for g in old_g_names]
-        g_count_sum = g_count_sum.div(g_count_sum.sum(axis=1), axis=0)
+        # g_count_sum = g_count_sum.div(g_count_sum.sum(axis=1), axis=0)
+        cmap = plt.cm.get_cmap("gnuplot2").reversed()
 
-        cmap = sns.cubehelix_palette(light=1.0, dark=0, as_cmap=True)
         sns.heatmap(
             g_count_sum,
+            # annot=True,
+            # fmt=".2g",
             cmap=cmap,
             square=False,
             linewidths=1.5,
-            center=1,
+            norm=matplotlib.colors.SymLogNorm(linthresh=1, base=10),
+            # center=0.5,
             cbar_kws={"shrink": 1.0},
             xticklabels=g_names,
             yticklabels=stage_id,
@@ -260,7 +314,7 @@ class BenchmarkPlotter:
             plt.subplots_adjust(top=0.9)
 
     def plot_compression_radar(
-        self, data, pipelines_settings, input_stage, output_stage, compression_features, baselines, title=None,
+        self, data, pipelines_settings, input_stage, output_stage, compression_features, title=None,
     ):
         sns.set(style="darkgrid", font_scale=1.5)
 
@@ -282,7 +336,9 @@ class BenchmarkPlotter:
         labels = [compression_features[key]["name"] for key in compression_features.keys()]
         angles = np.linspace(0, 2 * np.pi, len(labels) + 1, endpoint=True)
 
-        for p_id, p_cfg in pipelines_settings.items():
+        sorted_pipelines_settings = sorted(pipelines_settings.keys(), key=lambda x: x.lower(), reverse=True)
+        for p_id in sorted_pipelines_settings:
+            p_cfg = pipelines_settings[p_id]
             try:
                 stats = [mean_by_pipeline_id[col_name][p_id] for col_name in compression_features]
                 stats.append(stats[0])
@@ -307,6 +363,7 @@ class BenchmarkPlotter:
         # Draw ylabels
         ax.set_rlabel_position(-90)
         ax.set_yticks([0.0, 0.5, 1.0, 1.5])
+        ax.set_ylim(0, ax.get_ylim()[1])
         ax.tick_params(labelsize=4.0)
 
         plt.legend(loc="upper left", bbox_to_anchor=(0.9, 1.05), fancybox=False, framealpha=0, fontsize=4)
@@ -335,12 +392,24 @@ class BenchmarkPlotter:
 
         hardw_list = data["Pipeline Output Hardware Name"].drop_duplicates()
         targ_list = data["Test Target Generator Name"].drop_duplicates()
-        fig, axs = plt.subplots(len(hardw_list), len(targ_list), subplot_kw=dict(polar=True))
+        fig, axs = plt.subplots(
+            len(hardw_list),
+            len(targ_list),
+            subplot_kw=dict(polar=True),
+            figsize=(2.5 * len(targ_list), 2.5 * len(hardw_list)),
+        )
         # fig.subplots_adjust(bottom=0.15, left=0.4)
 
         for i_hardw, hardw in enumerate(hardw_list):
             for j_targ, targ in enumerate(targ_list):
-                ax = axs[i_hardw, j_targ]
+                if len(hardw_list) == 1 and len(targ_list) == 1:
+                    ax = axs
+                elif len(hardw_list) == 1:
+                    ax = axs[j_targ]
+                elif len(targ_list) == 1:
+                    ax = axs[i_hardw]
+                else:
+                    ax = axs[i_hardw, j_targ]
                 if i_hardw == 0:
                     ax.set_title(targ, fontsize=7, fontweight="bold", position=(0.5, 1.3))
                 if j_targ == 0:
@@ -353,9 +422,15 @@ class BenchmarkPlotter:
 
                 labels = [compression_features[key]["name"] for key in compression_features.keys()]
                 angles = np.linspace(0, 2 * np.pi, len(labels) + 1, endpoint=True)
-                ax.set_thetagrids(angles * 180 / np.pi, labels, fontweight="black")
+                if i_hardw == 0 and j_targ == 0:
+                    ax.set_thetagrids(angles * 180 / np.pi, labels, fontweight="black")
+                else:
+                    labels = [""] * len(labels)
+                    ax.set_thetagrids(angles * 180 / np.pi, labels, fontweight="black")
 
-                for p_id, p_cfg in pipelines_settings.items():
+                sorted_pipelines_settings = sorted(pipelines_settings.keys(), key=lambda x: x.lower(), reverse=True)
+                for p_id in sorted_pipelines_settings:
+                    p_cfg = pipelines_settings[p_id]
                     try:
                         stats = [mean_by_pipeline_id[col_name][p_id] for col_name in compression_features]
                         stats.append(stats[0])
@@ -376,10 +451,11 @@ class BenchmarkPlotter:
 
                     except Exception as e:
                         print(
-                            f"Can't plot plot_compression_radar '{title}', pipeline '{p_id}', compression_features:"
+                            f"Can't plot plot_compression_radar_grid '{title}', pipeline '{p_id}', compression_features:"
                             f" {compression_features}"
                         )
-
+                if i_hardw == 0 and j_targ == 0:
+                    ax.legend(loc="upper left", bbox_to_anchor=(0.9, 1.05), fancybox=False, framealpha=0, fontsize=5)
                 ax.grid(True)
                 # Fix axis to go in the right order and start at 12 o'clock.
                 ax.set_theta_offset(0)
@@ -387,17 +463,17 @@ class BenchmarkPlotter:
                 # Draw ylabels
                 ax.set_rlabel_position(-90)
                 ax.set_yticks([0.0, 0.5, 1.0, 1.5])
+                ax.set_ylim(0, ax.get_ylim()[1])
                 ax.tick_params(labelsize=5.0)
 
         fig.tight_layout()
-        plt.legend(loc="upper left", bbox_to_anchor=(0.9, 1.05), fancybox=False, framealpha=0, fontsize=5)
 
         if title is not None:
             plt.suptitle(title, fontweight="bold")
             plt.subplots_adjust(top=0.7)
 
     def plot_pipelines_compression_factor(
-        self, data, pipelines_settings, input_stage, output_stage, compression_features, baselines, title=None,
+        self, data, pipelines_settings, input_stage, output_stage, compression_features, baseline, title=None,
     ):
         sns.set(style="darkgrid", font_scale=1.5)
 
@@ -441,30 +517,40 @@ class BenchmarkPlotter:
             plt.suptitle(title, fontweight="bold")
             plt.subplots_adjust(top=0.9)
 
-        for bl_name, bl_cfg in baselines.items():
-            plt.hlines(bl_cfg["value"], *g.ax.get_xlim(), **bl_cfg["style"], label=bl_name)
+        if baseline:
+            plt.hlines(baseline["value"], *g.ax.get_xlim(), **baseline["style"], label=baseline["name"])
 
         g.despine(left=True, bottom=False)
         g.set_ylabels("Compression Factor")
 
+    def plot_connectivity_map(self, data, title, hardware_list):
+        sns.set(style="darkgrid", font_scale=1.5)
+        hw_name = data["Pipeline Output Hardware Name"].to_list()[0]
+        if not isinstance(hardware_list, list):
+            raise TypeError("hardware_list is not a list")
 
-def main():
-    from arline_benchmarks.config_parser.pipeline_config_parser import PipelineConfigParser
+        for cfg in hardware_list:
+            hw = hardware_by_name(cfg)
+            if hw.name == hw_name:
+                break
 
-    parser = argparse.ArgumentParser(description="Plot curves", formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    parser.add_argument("--csv", "-c", type=str, required=True, help="path to csv file", nargs="+")
-    parser.add_argument("--output_dir", "-o", type=str, help="Output directory", required=True)
-    parser.add_argument("--config", "-j", type=str, help="Jsonnet config", required=True)
-    parser.add_argument("--dpi", "-r", type=int, default=150, required=False, help="Output resolution")
-    args = parser.parse_args()
+        cmap = sns.light_palette((260, 75, 60), input="husl")
+        adj_mat = hw.qubit_connectivity._connectivity
+        num_qubs = adj_mat.shape[0]
+        g = sns.heatmap(
+            adj_mat,
+            cmap=cmap,
+            linewidths=0.5,
+            center=1,
+            cbar_kws={"shrink": 1.0},
+            square=True,
+            alpha=0.5,
+            cbar=False,
+            xticklabels=np.arange(num_qubs),
+            yticklabels=np.arange(num_qubs),
+        )
 
-    data = []
-    for f in args.csv:
-        data.append(pd.read_csv(f))
-    config = PipelineConfigParser(args.config)
-    bp = BenchmarkPlotter(data=pd.concat(data), output_path=args.output_dir, config=config)
-    bp.plot()
-
-
-if __name__ == "__main__":
-    main()
+        title = hw_name
+        if title is not None:
+            plt.suptitle(title, fontweight="bold")
+            plt.subplots_adjust(top=0.9)

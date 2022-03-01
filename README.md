@@ -3,8 +3,6 @@
 **Arline Benchmarks** platform allows to benchmark various algorithms for quantum circuit mapping/compression against
 each other on a list of predefined hardware types and target circuit classes.
 
-Arline Benchmarks has been recently used by Oxford Quantum Circuits team for compiler performance testing (see [blog post](https://oxfordquantumcircuits.com/oqc-integrates-tket)).
-
 ## Demo (report generation preview)
 
 ### Benchmarking run
@@ -17,6 +15,9 @@ Arline Benchmarks has been recently used by Oxford Quantum Circuits team for com
 
 * [Google Cirq library](https://github.com/quantumlib/Cirq)
 * [IBM Qiskit](https://github.com/Qiskit)
+* [CQC Tket](https://github.com/CQCL/tket)
+* [PyZX](https://github.com/Quantomatic/pyzx)
+* [VOQC](https://github.com/inQWIRE/pyvoqc)
 
 ## Installation
 
@@ -56,6 +57,13 @@ Alternatively, Arline Benchmarks can be installed in the editable mode:
 
 ```console
 $ pip3 install -e .
+```
+
+### Setting Environment Variables
+
+Add to your `~/.profile`:
+```bash
+export ARLINE_BENCHMARKS=<full path to arline_benchmarks repository>
 ```
 
 ### TeXLive installation
@@ -206,4 +214,4 @@ arline_benchmarks
 
 ## Contributors
 
-**Arline team**: Yaroslav Kharkov, Eugeny Mikhentiev, Alina Ivanova, Alex Kotelnikov
+**Turation team**: Yaroslav Kharkov, Eugeny Mikhentiev, Alina Ivanova, Alex Kotelnikov

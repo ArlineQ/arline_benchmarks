@@ -6,11 +6,21 @@ import numpy as np
 
 from arline_benchmarks.targets.target import RandomChainTarget
 
+from arline_quantum.gates.cnot import Cnot
+
 
 class TestTarget(unittest.TestCase):
     def test_random_chain_wo_2qubit_limit_creation(self):
         chain_length = 100
-        hw_cfg = {"gate_set": ["Rx(2*pi/30)", "Cnot"], "num_qubits": 2, "qubit_connectivity": [[0, 1], [1, 0]]}
+        hw_cfg = {
+            "gate_set": ["Rx(2*pi/30)", "Cnot"],
+            "qubit_connectivity": {
+                "adj_matrix": [[0, 1], [1, 0]],
+                "args": {
+                    "num_qubits": 2,
+                }
+            }
+        }
         target_cfg = {
             "task": "decomposition",
             "algo": "random_chain",
@@ -28,7 +38,16 @@ class TestTarget(unittest.TestCase):
 
     def test_random_chain_depth_limit(self):
         depth_limit = 5
-        hw_cfg = {"gate_set": ["Rx(2*pi/30)", "Cnot"], "num_qubits": 4, "qubit_connectivity": "All2All"}
+        hw_cfg = {
+            "gate_set": ["Rx(2*pi/30)", "Cnot"],
+            "qubit_connectivity": {
+                "class": "All2All",
+                "args": {
+                    "num_qubits": 4,
+                }
+            }
+
+        }
         target_cfg = {
             "task": "circuit_transformation",
             "algo": "random_chain",
@@ -46,7 +65,16 @@ class TestTarget(unittest.TestCase):
             self.assertEqual(chain.get_depth(), depth_limit)
 
     def test_random_chain_gate_distribution(self):
-        hw_cfg = {"gate_set": ["Rx(2*pi/30)", "Cnot"], "num_qubits": 3, "qubit_connectivity": np.ones((3, 3)).tolist()}
+        hw_cfg = {
+            "gate_set": ["Rx(2*pi/30)", "Cnot"],
+            "qubit_connectivity": {
+                "adj_matrix": np.ones((3, 3)).tolist(),
+                "args": {
+                    "num_qubits": 2,
+                }
+            }
+
+        }
         target_cfg = {
             "task": "decomposition",
             "algo": "random_chain",
@@ -71,7 +99,16 @@ class TestTarget(unittest.TestCase):
         for chain_length in [1, 100]:
             with self.subTest(chain_length=chain_length):
                 cnot_number = 1
-                hw_cfg = {"gate_set": ["Rx(2*pi/30)", "Cnot"], "num_qubits": 2, "qubit_connectivity": [[0, 1], [1, 0]]}
+                hw_cfg = {
+                    "gate_set": ["Rx(2*pi/30)", "Cnot"],
+                    "qubit_connectivity": {
+                        "adj_matrix": [[0, 1], [1, 0]],
+                        "args": {
+                            "num_qubits": 2,
+                        }
+                    }
+                }
+
                 target_cfg = {
                     "task": "decomposition",
                     "algo": "random_chain",
@@ -88,9 +125,9 @@ class TestTarget(unittest.TestCase):
 
                 for i in range(100):
                     target_chain, _ = next(t)
-                    self.assertLessEqual(target_chain.get_gate_count()["Cnot"], cnot_number)
+                    self.assertLessEqual(target_chain.get_gate_count_by_gate_type(Cnot), cnot_number)
                     self.assertEqual(len(target_chain), chain_length)
-                    total_cnot_cnt += target_chain.get_gate_count()["Cnot"]
+                    total_cnot_cnt += target_chain.get_gate_count_by_gate_type(Cnot)
 
                 self.assertGreater(total_cnot_cnt, 0)
 
@@ -98,7 +135,15 @@ class TestTarget(unittest.TestCase):
         for chain_length in [3, 100]:
             with self.subTest(chain_length=chain_length):
                 cnot_number = 3
-                hw_cfg = {"gate_set": ["Rx(2*pi/30)", "Cnot"], "num_qubits": 2, "qubit_connectivity": [[0, 1], [1, 0]]}
+                hw_cfg = {
+                    "gate_set": ["Rx(2*pi/30)", "Cnot"],
+                    "qubit_connectivity": {
+                        "adj_matrix": [[0, 1], [1, 0]],
+                        "args": {
+                            "num_qubits": 2,
+                        }
+                    }
+                }
                 target_cfg = {
                     "task": "decomposition",
                     "algo": "random_chain",
@@ -114,7 +159,7 @@ class TestTarget(unittest.TestCase):
 
                 for i in range(100):
                     target_chain, _ = next(t)
-                    self.assertEqual(target_chain.get_gate_count()["Cnot"], cnot_number)
+                    self.assertLessEqual(target_chain.get_gate_count_by_gate_type(Cnot), cnot_number)
                     self.assertEqual(len(target_chain), chain_length)
 
 

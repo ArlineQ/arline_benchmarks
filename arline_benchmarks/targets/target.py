@@ -17,13 +17,13 @@
 
 import itertools
 from glob import glob
-from os import listdir
-from os.path import basename, isfile, join, splitext
+from os.path import basename, join, splitext, expandvars
 
 import numpy as np
 
 from arline_quantum.gate_chain.gate_chain import GateChain
 from arline_quantum.gates.u3 import U3
+
 from arline_quantum.hardware import hardware_by_name
 
 
@@ -106,7 +106,7 @@ class RandomChainTarget(GateChainTarget):
 
     def __init__(self, config):
         super().__init__(config=config)
-        self._quantum_hardware = hardware_by_name(self._cfg)
+        self._quantum_hardware = hardware_by_name(self._cfg["hardware"])
         self._actions = []
         self.two_qubit_actions = []
         self.id = 0
@@ -173,16 +173,16 @@ class RandomChainTarget(GateChainTarget):
                 empty_p_cnt = sum([1 if p is None else 0 for p in self._actions_probabilities])
 
                 if total_p > 1:
-                    raise Exception("The sum of gates probabilies must be <= 1")
+                    raise Exception("The sum of gates probabilities must be <= 1")
                 if total_p != 1:
                     if empty_p_cnt == 0:
-                        raise Exception("The sum of gates probabilies must be == 1")
+                        raise Exception("The sum of gates probabilities must be == 1")
                     else:
                         self._actions_probabilities = [
                             p if p is not None else (1 - total_p) / empty_p_cnt for p in self._actions_probabilities
                         ]
 
-                print("Actions probabilities:\n", {a[0]: p for a, p in zip(self._actions, self._actions_probabilities)})
+                #print("Actions probabilities:\n", {a[0]: p for a, p in zip(self._actions, self._actions_probabilities)})
 
             if self.two_qubit_gate_num_upper_bound is not None and self._actions_probabilities is not None:
                 raise Exception(
@@ -225,8 +225,15 @@ class RandomChainTarget(GateChainTarget):
             else:
                 action = self.np_random.choice(range(len(self._actions)), p=self._actions_probabilities)
                 action_name, gate_class, appy_to_qubits = self._actions[action]
+
             if gate_class == U3:
-                angles = self.np_random.uniform(low=0, high=2 * np.pi, size=3)
+                # Haar random unitary rotation matrix
+                theta = np.arccos(self.np_random.uniform(low=-1, high=1))
+                phi, lmbda = self.np_random.uniform(low=0, high=2 * np.pi, size=2)
+                gate = gate_class(theta, phi, lmbda)
+            elif gate_class.num_angles > 0:
+                # Uniform rotation [0, 2*pi]
+                angles = self.np_random.uniform(low=0, high=2 * np.pi, size=gate_class.num_angles)
                 gate = gate_class(*angles)
             else:
                 gate = gate_class()
@@ -242,17 +249,16 @@ class QasmChainTarget(GateChainTarget):
     r"""Qasm Chain Target Class
 
     **Description:**
-        Generates target quantum circuits (gate chains) from a .qasm dataset.
-        QASM circuits are stored in folder `arline_benchmarking/benchmarking/circuits`.
+        Generates target gate chains from a .qasm dataset.
     """
     algo = "qasm"  # TODO algo -> type
 
     def __init__(self, config):
         super().__init__(config=config)
         if isinstance(self._cfg["qasm_path"], str):
-            self.qasm_list = glob(join(self._cfg["qasm_path"], "*.qasm"))
+            self.qasm_list = glob(join(expandvars(self._cfg["qasm_path"]), "*.qasm"))
         if isinstance(self._cfg["qasm_path"], list):
-            self.qasm_list = self._cfg["qasm_path"]
+            self.qasm_list = [expandvars(f) for f in self._cfg["qasm_path"]]
         self.number = len(self.qasm_list)
         self.qasm_number = 0
 

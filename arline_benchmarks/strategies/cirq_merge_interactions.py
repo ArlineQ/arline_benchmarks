@@ -1,3 +1,4 @@
+
 # Arline Benchmarks
 # Copyright (C) 2019-2020 Turation Ltd
 #
@@ -15,34 +16,34 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-from arline_benchmarks.strategies.strategy import Strategy
-from arline_benchmarks.metrics.gate_chain_analyser import GateChainTransformAnalyser, SynthesisAnalyser
+from timeit import default_timer as timer
+
+from arline_benchmarks.strategies.strategy import CompressionStrategy
 from arline_quantum.gate_chain.gate_chain import GateChain
 
+from cirq.optimizers import MergeInteractions
 
-_strategy_class_name = "TargetAnalysis"
+
+_strategy_class_name = "CirqMergeInteractions"
 
 
-class TargetAnalysis(Strategy):
-    r"""Dummy strategy to run analyser
+class CirqMergeInteractions(CompressionStrategy):
+    r"""Strategy for Cirq Merge Interactions 1q+2q
     """
 
-    def __init__(
-        self,
-        analyser_options={}
-    ):
-        super().__init__(analyser_options)
-
     def run(self, target, run_analyser=True):
-        if run_analyser:
-            self.analyse(target, target)
-            self.analyser_report["Execution Time"] = 0
-        return target
+        circuit_object = target.convert_to("cirq")
 
-    def analyse(self, target, result):
-        if self.analyser is None:
-            if isinstance(target, GateChain):
-                self.analyser = GateChainTransformAnalyser()
-            else:
-                self.analyser = SynthesisAnalyser()
-        self.analyser_report = self.analyser.run_all(target, result)
+        start_time = timer()
+
+        MergeInteractions().optimize_circuit(circuit_object)
+
+        self.execution_time = timer() - start_time
+
+        gate_chain = GateChain.convert_from(circuit_object, format_id="cirq")
+        gate_chain.quantum_hardware = self.quantum_hardware
+
+        if run_analyser:
+            self.analyse(target, gate_chain)
+            self.analyser_report["Execution Time"] = self.execution_time
+        return gate_chain
