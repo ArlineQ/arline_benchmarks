@@ -1,0 +1,44 @@
+#!/usr/bin/env python3
+
+# Arline Benchmarks
+# Copyright (C) 2019-2020 Turation Ltd
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+import argparse
+import pandas as pd
+
+from arline_benchmarks.reports.plot_benchmarks import BenchmarkPlotter
+
+
+def main():
+    from arline_benchmarks.config_parser.pipeline_config_parser import PipelineConfigParser
+
+    parser = argparse.ArgumentParser(description="Plot curves", formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser.add_argument("--csv", "-c", type=str, required=True, help="path to csv file", nargs="+")
+    parser.add_argument("--output_dir", "-o", type=str, help="Output directory", required=True)
+    parser.add_argument("--config", "-j", type=str, help="Jsonnet config", required=True)
+    parser.add_argument("--dpi", "-r", type=int, default=150, required=False, help="Output resolution")
+    args = parser.parse_args()
+
+    data = []
+    for f in args.csv:
+        data.append(pd.read_csv(f))
+    config = PipelineConfigParser(args.config)
+    bp = BenchmarkPlotter(data=pd.concat(data), output_path=args.output_dir, config=config)
+    bp.plot()
+
+
+if __name__ == "__main__":
+    main()

@@ -15,46 +15,39 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-import os
-import tempfile
 from timeit import default_timer as timer
 
-from arline_benchmarks.strategies.strategy import MappingStrategy
+from arline_benchmarks.strategies.strategy import CompressionStrategy
 from arline_quantum.gate_chain.gate_chain import GateChain
+from arline_quantum.gate_chain.basis_translator import ArlineTranslator
+from arline_quantum.gate_sets.cx_rz_rx import CnotRzRxGateSet
 
-from qiskit import QuantumCircuit
-from qiskit.compiler import transpile
+from cirq.google.optimizers import optimized_for_xmon
 
-_strategy_class_name = "QiskitMapping"
+_strategy_class_name = "CirqOptimizeForXmon"
 
 
-class QiskitMapping(MappingStrategy):
-    r"""Class Wrapper for Qiskit Mapping Strategy
+class CirqOptimizeForXmon(CompressionStrategy):
+    r"""Convert To Xmon Gates (Native Gates For Google Transmon Devices)
     """
 
-    def __init__(self, cfg):
-        super().__init__(cfg)
-        self.qiskit_hardware = self.quantum_hardware.convert_to_qiskit_hardware()
-
     def run(self, target, run_analyser=True):
-        with tempfile.TemporaryDirectory() as tmpdirname:
-            fname = os.path.join(tmpdirname, "target.qasm")
-            target.save_to_qasm(fname, qreg_name="q")
-            original_circuit = QuantumCircuit.from_qasm_file(fname)
+        unique_gates = set([g.gate.name for g in target.chain])
+        if not all(g in CnotRzRxGateSet().get_gate_list_str() for g in unique_gates):
+            gate_chain = ArlineTranslator().rebase_to_cx_rz_rx(target)
+        else:
+            gate_chain = target
+        circuit_object = gate_chain.convert_to("cirq")
 
         start_time = timer()
-        optimised_circuit = transpile(
-            original_circuit,
-            backend=self.qiskit_hardware,
-            seed_transpiler=self._cfg["seed_transpiler"],
-            optimization_level=0,
-            routing_method=self._cfg["routing_method"],
-        )
+
+        circuit_object = optimized_for_xmon(circuit_object)
+
         self.execution_time = timer() - start_time
 
-        qasm_data = optimised_circuit.qasm()
-        lines = qasm_data.split("\n")
-        gate_chain = GateChain.from_qasm_list_of_lines(lines, quantum_hardware=None)
+        gate_chain = GateChain.convert_from(circuit_object, format_id="cirq")
+        gate_chain.quantum_hardware = self.quantum_hardware
+
         if run_analyser:
             self.analyse(target, gate_chain)
             self.analyser_report["Execution Time"] = self.execution_time

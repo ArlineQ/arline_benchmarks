@@ -25,7 +25,6 @@ import pandas as pd
 from tqdm import tqdm
 
 from arline_benchmarks.pipeline.pipeline import Pipeline
-from arline_benchmarks.reports.plot_benchmarks import BenchmarkPlotter
 from arline_benchmarks.reports.results_logger import open_csv_results_logger
 from arline_benchmarks.targets.target import Target
 from arline_quantum.gate_chain.gate_chain import GateChain
@@ -41,9 +40,10 @@ class PipelineEngine:
         self.run_id = 0
 
     def run(self):
+        exit_code = 0
         # Output path
-        output_dir = path.join(self.args.output, "output")
-        output_qasm_dir = path.join(output_dir, "output_qasm")
+        output_dir = path.join(self.args.output)
+        output_qasm_dir = path.join(output_dir, "qasm")
         self.create_result_dir(output_dir)
         self.create_result_dir(output_qasm_dir)
         # Convert .jsonnet config file to .json
@@ -60,7 +60,7 @@ class PipelineEngine:
             "Pipeline Output Hardware Name",
             "Pipeline Output Number of Qubits",
             "QASM Path",
-            "Plot Group",
+            "Test Type",
         ]
 
         columns_first = []
@@ -91,6 +91,7 @@ class PipelineEngine:
                         traceback.print_exc(file=sys.stderr)
                         print("Target config:", file=sys.stderr)
                         pprint(pipeline_cfg["target"], stream=sys.stderr)
+                        exit_code = -2
                         continue
 
                 for target, target_id in tqdm(
@@ -107,43 +108,51 @@ class PipelineEngine:
                         traceback.print_exc(file=sys.stderr)
                         print("Pipeline config:", file=sys.stderr)
                         pprint(pipeline_cfg, stream=sys.stderr)
+                        exit_code = -1
                         continue
 
                     for stg_cfg, stage_result, stg_report in zip(
                         pipeline.stages, pipeline.stage_results, pipeline.analyser_report_history
                     ):
                         # Save Gate Chain
-                        qasm_path = path.join(
+                        file_path = path.join(
                             output_qasm_dir,
-                            "{}_output_{}_{}_{}.qasm".format(
-                                self.run_id, pipeline_cfg["target"]["name"], target_id, stg_cfg["id"]
+                            "{}_output_{}_{}_{}_{}".format(
+                                self.run_id,
+                                pipeline_cfg["id"],
+                                pipeline_cfg["target"]["name"],
+                                target_id,
+                                stg_cfg["id"]
                             ),
                         )
+                        qasm_path = file_path+".qasm"
+                        chain_path = file_path+".pkl"
                         if isinstance(stage_result, GateChain):
                             stage_result.save_to_qasm(qasm_path, "q")
 
-                        # Add result into report
+                            # stage_result.save_chain(chain_path)      #TODO fix problem with make_discrete
+                        # Add result to the .csv report
+
                         hardw = pipeline.strategy_list[-1].quantum_hardware  # Take hardware the last stage
                         csv_logger.add_results(
                             line_id=(
                                 self.run_id,  # "Run ID",
                                 pipeline_cfg["id"],  # "Pipeline ID",
                                 stg_cfg["id"],  # "Stage ID",
-                                stg_cfg["config"]["strategy"],  # "Strategy ID"
+                                stg_cfg["strategy"],  # "Strategy ID"
                                 pipeline_cfg["target"]["name"],  # "Test Target Generator Name",
                                 target_id,  # "Test Target ID",
-                                "{}{}Q".format(hardw.name, hardw.num_qubits),  # "Pipeline Output Hardware Name",
+                                "{}".format(hardw.name),  # "Pipeline Output Hardware Name",
                                 hardw.num_qubits,  # "Pipeline Output Number of Qubits",
                                 qasm_path,  # "QASM path"
-                                pipeline_cfg["plot_group"],  # "Plot Group"
+                                pipeline_cfg["test_type"],  # "Test Type"
                             ),
                             data=stg_report,
                         )
                     self.run_id += 1
 
         data = pd.read_csv(report_file)
-        bp = BenchmarkPlotter(data=data, output_path=path.join(output_dir, "figures"), config=self.cfg)
-        bp.plot()
+        return exit_code
 
     def create_result_dir(self, d):
         rmtree(d, ignore_errors=True)

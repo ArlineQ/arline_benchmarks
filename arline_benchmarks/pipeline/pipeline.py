@@ -32,7 +32,7 @@ class Pipeline:
         self.id = pipeline_id
         self.strategy_list = []
         for st_cfg in stages:
-            self.strategy_list.append(Strategy.from_config(st_cfg["config"]))
+            self.strategy_list.append(Strategy.from_config(st_cfg))
 
     def run(self, target):
         self.stage_results = []
@@ -45,15 +45,22 @@ class Pipeline:
             self.stage_results.append(prev_stage_result)
             # Return analyser results for the current compilation stage
             if self.run_analyser:
+                strategy.analyser_report["Total Execution Time"] = self.get_accumulated_execution_time(
+                    strategy.analyser_report["Execution Time"]
+                )
+                strategy.analyser_report["Full Check"] = (
+                    strategy.analyser_report["Connectivity Satisfied"]
+                    and strategy.analyser_report["Gate Set Satisfied"]
+                    and strategy.analyser_report["Qubit Number Satisfied"]
+                )
                 self.analyser_report_history.append(strategy.analyser_report)
         return prev_stage_result
 
-    def get_execution_time(self):
-        execution_time = 0
-        # Get runtime of the current compilation stage
-        for i in self.analyser_report_history:
-            execution_time += i["execution_time"]
-        return execution_time
+    def get_accumulated_execution_time(self, last_stage_execution_time):
+        if not self.analyser_report_history:
+            return last_stage_execution_time
+        else:
+            return self.analyser_report_history[-1]["Total Execution Time"] + last_stage_execution_time
 
     def get_execution_time_by_stage(self, index):
         # Get runtime info for a particular compilation stage enumerated by index

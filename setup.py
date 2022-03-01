@@ -21,7 +21,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="arline-benchmarks",
-    version="0.1.7",
+    version="0.1.8",
     author="Turation Ltd",
     author_email="info@arline.io",
     description="Automated benchmarking platform for quantum compilers",
@@ -32,18 +32,23 @@ setuptools.setup(
     license="GNU Affero General Public License v3 (AGPLv3)",
     install_requires=[
         "numpy>=1.18.3",
-        "scipy>=1.3.1",
+        "scipy>=1.4",
         "jsonnet>=0.15.0",
         "pylatex>=1.3.1",
-        "py-cpuinfo>=5.0.0",
+        "py-cpuinfo~=5.0.0",
         "psutil>=5.7.0",
         "pandas>=0.25.3",
         "tqdm>=4.46.0",
         "seaborn>=0.10.1",
-        "matplotlib>=3.2.1",
-        "cirq~=0.6.0",
-        "qiskit~=0.18.0",
-        "arline-quantum~=0.1.7",
+        "matplotlib==3.2.1",
+        "cirq==0.13.1",
+        "qiskit~=0.34.2",
+        "pyzx==0.6.0",
+        "pytket==0.6.0",
+        # old qiskit version to support pytket-qiskit
+        # "qiskit~=0.18.0",
+        "arline-quantum~=0.1.8",
+        "jkq.qcec==1.5"
     ],
     classifiers=[
         "Programming Language :: Python :: 3",
@@ -52,7 +57,8 @@ setuptools.setup(
     ],
     scripts=[
         "scripts/arline-benchmarks-runner",
-        "scripts/arline-latex-report-generator",
+        "scripts/arline-benchmarks-plotter",
+        "scripts/arline-benchmarks-latex-report-generator",
     ],
     python_requires=">=3.6",
     include_package_data=True,

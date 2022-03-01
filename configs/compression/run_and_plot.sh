@@ -18,7 +18,10 @@
 
 
 # run benchmark comparison with configuration defined in ./config.jsonnet
-arline-benchmarks-runner -c config.jsonnet -o results
+arline-benchmarks-runner -c config.jsonnet -o results/benchmarks
 
-# run LaTeX report engine
-arline-latex-report-generator -i results -o results
+# Draw figures for LaTeX Report
+arline-benchmarks-plotter --csv results/benchmarks/gate_chain_report.csv -j config.jsonnet -o results/figures
+
+# Run LaTeX report engine
+arline-benchmarks-latex-report-generator -j config.jsonnet -i results -o results/latex_report
