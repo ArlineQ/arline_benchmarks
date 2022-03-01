@@ -422,7 +422,7 @@ class LatexReport:
             NoEscape(
                 r"""Note that in most cases single-qubit gate count and single-qubit gate compression factor
                 have only limited meaning as a metric of compiler performance.This is because single-qubit
-                gate count is very sensitive to the choice single-qubit basis gates (e.g. $U_3$ is 
+                gate count is very sensitive to the choice single-qubit basis gates (e.g. $U_3$ is
                 equivalent to a combination of 3 rotation gates $R_x$, $R_y$ and $R_z$)."""
             )
         )
@@ -609,7 +609,7 @@ class LatexReport:
                     self.doc.append(
                         NoEscape(
                             f"""v{version('cirq')} (open-source). """
-                            + r"""\textbf{Cirq} has been developed by Google AI Quantum Team. Cirq supports 
+                            + r"""\textbf{Cirq} has been developed by Google AI Quantum Team. Cirq supports
                             mapping/routing operations and tailored towards specific grid-like qubit coupling
                             topologies."""
                         )
@@ -633,8 +633,8 @@ class LatexReport:
                 with self.doc.create(Itemize()) as itemize:
                     itemize.add_item(
                         NoEscape(
-                            r"""\textbf{PyZX} git cc34a6b (Radboud University, open-source). PyZX realizes 
-                            a non-standard approach to quantum circuit compression based on ZX-calculus 
+                            r"""\textbf{PyZX} git cc34a6b (Radboud University, open-source). PyZX realizes
+                            a non-standard approach to quantum circuit compression based on ZX-calculus
                             (``spider''-calculus). PyZX only supports hardware with all-to-all qubit connectivity. """
                         )
                     )
@@ -663,7 +663,7 @@ class LatexReport:
             with self.doc.create(Itemize()) as itemize:
                 itemize.add_item(
                     NoEscape(
-                        r"""Compression factor greater then unity ($CF(G)>1$) corresponds to a successful compression 
+                        r"""Compression factor greater then unity ($CF(G)>1$) corresponds to a successful compression
                         (the gate count of the gate ($G$) in the output circuit is less compared to the input circuit).
                         Similarly, compression factor less then unity ($CF(G)<1$) corresponds to
                         unsuccessful compression (the output circuit contains more gates of type ($G$)
@@ -708,7 +708,7 @@ class LatexReport:
             self.doc.append(
                 NoEscape(
                     r"""Note that in most cases single-qubit gate count and single-qubit gate compression factor
-                    have only limited meaning as a metric of compiler performance. This is because single-qubit 
+                    have only limited meaning as a metric of compiler performance. This is because single-qubit
                     gate count is very sensitive to the choice single-qubit basisgates (e.g. $U_3$ is equivalent
                     to a combination of 3 rotation gates $R_x$, $R_y$ and $R_z$)."""
                 )
@@ -786,7 +786,7 @@ class LatexReport:
         with self.doc.create(Section("System Info")):
             with self.doc.create(Itemize()) as itemize:
                 itemize.add_item(f"Platform: {platform.platform(aliased=1)}")
-                itemize.add_item(f"Processor: {cpuinfo.get_cpu_info()['brand']}")
+                itemize.add_item(f"Processor: {cpuinfo.get_cpu_info()['brand_raw']}")
                 memory = virtual_memory().total / 2 ** 30
                 itemize.add_item(f"Memory: {round(memory, 1)} Gb")
 
@@ -929,7 +929,7 @@ class LatexReport:
                         fig.add_caption(
                             NoEscape(
                                 rf"""Aggregate multi-factor comparison of compilation frameworks: compression factor
-                                ($CF$) across various features and circuit cost improvement. Columns correspond to 
+                                ($CF$) across various features and circuit cost improvement. Columns correspond to
                                 specific target circuit classes, and row correspond to different hardware architectures.
                                 Better performance corresponds to a larger polygon area."""
                             )
@@ -946,7 +946,7 @@ class LatexReport:
                             NoEscape(
                                 rf"""Aggregate multi-factor comparison of compilation frameworks: compression factor
                                 ($CF$) across various features. Columns correspond to specific target circuit classes,
-                                and row correspond to different hardware architectures. Better performance corresponds 
+                                and row correspond to different hardware architectures. Better performance corresponds
                                 to a larger polygon area."""
                             )
                         )
@@ -973,7 +973,7 @@ class LatexReport:
                 self.doc.append(Hyperref(marker="", text="""https://github.com/Quantomatic/pyzx"""))
             itemize.add_item(
                 NoEscape(
-                    r"""P. Jurcevic et al, "Demonstration of quantum volume 64 on a superconducting quantum 
+                    r"""P. Jurcevic et al, "Demonstration of quantum volume 64 on a superconducting quantum
                     computing system", https://arxiv.org/abs/2008.08571 (2020)."""
                 )
             )
@@ -1031,7 +1031,7 @@ class LatexReport:
             )
             self.doc.append(
                 NoEscape(
-                    r"""platform is created to solve benchmarking problem in the quantum world and aims to provide a 
+                    r"""platform is created to solve benchmarking problem in the quantum world and aims to provide a
                     fair comparison between compilers for various quantum hardware and quantum algorithms.
                     """
                 )
