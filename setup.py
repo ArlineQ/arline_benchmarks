@@ -1,5 +1,5 @@
 # Arline Benchmarks
-# Copyright (C) 2019-2020 Turation Ltd
+# Copyright (C) 2019-2022 Turation Ltd
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -35,8 +35,8 @@ setuptools.setup(
         "scipy>=1.4",
         "jsonnet>=0.15.0",
         "pylatex>=1.3.1",
-        "py-cpuinfo>=5.0.0",
-        "psutil>=5.9.0",
+        "py-cpuinfo~=5.0.0",
+        "psutil>=5.7.0",
         "pandas>=0.25.3",
         "tqdm>=4.46.0",
         "seaborn>=0.10.1",

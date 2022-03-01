@@ -1,4 +1,4 @@
-# Copyright (C) 2019-2020 Turation Ltd
+# Copyright (C) 2019-2022 Turation Ltd
 
 from timeit import default_timer as timer
 

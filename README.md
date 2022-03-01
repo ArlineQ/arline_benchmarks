@@ -63,7 +63,7 @@ $ pip3 install -e .
 
 ### VOQC installation
 
-To install Python wrapper for VOQC package follow [instructions](https://github.com/inQWIRE/pyvoqc).
+To install Python wrapper for VOQC package follow [these instructions](https://github.com/inQWIRE/pyvoqc).
 
 ### Setting Environment Variables
 
