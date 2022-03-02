@@ -1,9 +1,9 @@
-# Copyright (C) 2019-2020 Turation Ltd
+# Copyright (C) 2019-2022 Turation Ltd
 
 from timeit import default_timer as timer
 
 from arline_benchmarks.strategies.strategy import CompressionStrategy
-from arline_ml.quantum.gate_chain.pytket_converter import PytketGateChainConverter
+from arline_quantum.gate_chain.converters import PytketGateChainConverter
 
 from pytket.passes import FullPeepholeOptimise
 
