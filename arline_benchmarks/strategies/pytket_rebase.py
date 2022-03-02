@@ -9,7 +9,7 @@ from arline_quantum.gate_sets.ibm import IbmGateSet
 from arline_quantum.gate_sets.ionq import IonqGateSet
 from arline_ml.quantum.gate_sets.pyzx import PyzxGateSet
 from arline_quantum.gate_sets.rigetti import RigettiGateSet
-from arline_ml.quantum.gate_chain.pytket_converter import PytketGateChainConverter
+from arline_quantum.gate_chain.converters import PytketGateChainConverter
 
 from pytket.cirq import tk_to_cirq
 from pytket.passes import RebaseCirq, RebaseIBM, RebasePyZX, RebaseQuil, RebaseUMD

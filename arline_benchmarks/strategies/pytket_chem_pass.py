@@ -3,7 +3,7 @@
 from timeit import default_timer as timer
 
 from arline_benchmarks.strategies.strategy import CompressionStrategy
-from arline_ml.quantum.gate_chain.pytket_converter import PytketGateChainConverter
+from arline_quantum.gate_chain.converters import PytketGateChainConverter
 from arline_quantum.gate_chain.basis_translator import ArlineTranslator
 from arline_quantum.gate_sets.cx_rz_rx import CnotRzRxGateSet
 
